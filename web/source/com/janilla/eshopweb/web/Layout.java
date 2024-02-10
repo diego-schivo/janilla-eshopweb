@@ -1,0 +1,72 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024 Diego Schivo
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.janilla.eshopweb.web;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.Format;
+
+import com.janilla.eshopweb.core.ApplicationUser;
+import com.janilla.frontend.RenderEngine;
+import com.janilla.frontend.Renderer;
+import com.janilla.web.Render;
+
+@Render(template = "Layout.html")
+public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.html") int basket,
+		Object content) implements Renderer {
+
+	public Login login() {
+		return user == null ? new Login() : null;
+	}
+
+	public Logout logout() {
+		return user != null ? new Logout(user) : null;
+	}
+
+	static Format currencyFormat = new DecimalFormat("0.00");
+
+	@Override
+	public Object render(RenderEngine engine) throws IOException {
+		if (engine.getObject() instanceof BigDecimal x)
+			return currencyFormat.format(x);
+		return CANNOT_RENDER;
+	}
+
+	@Render(template = "Layout-Login.html")
+	public record Login() {
+	}
+
+	@Render(template = "Layout-Logout.html")
+	public record Logout(ApplicationUser user) {
+
+		public Admin admin() {
+			return user.getRoles().contains("Administrators") ? new Admin() : null;
+		}
+
+		@Render(template = "Layout-Logout-Admin.html")
+		public record Admin() {
+		}
+	}
+}

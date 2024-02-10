@@ -1,0 +1,49 @@
+<div class="container account-login-container">
+	<h2>Log in</h2>
+	<div class="row">
+		<div class="col-md-12">
+			<section>
+				<form method="post">
+					<hr />
+					<div class="text-danger validation-summary-valid" data-valmsg-summary="true">
+						<ul>
+							<li style="display: none"></li>
+						</ul>
+					</div>
+					<div class="form-group">
+						<label for="email">Email</label>
+						<input class="form-control" type="email" id="email" name="email" value="demouser@microsoft.com" />
+						<span class="text-danger field-validation-valid"></span>
+					</div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<input class="form-control" type="password" id="password" name="password" value="Pass@word1" />
+						<span class="text-danger field-validation-valid"></span>
+					</div>
+					<div class="form-group">
+						<div class="checkbox">
+							<label for="rememberMe">
+								<input type="checkbox" id="rememberMe" name="rememberMe" value="true" />
+								Remember me?
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<button type="submit" class="btn btn-default">Log in</button>
+					</div>
+					<div class="form-group">
+						<p>
+							<a href="/Identity/Account/ForgotPassword">Forgot your password?</a>
+						</p>
+						<p>
+							<a href="/Identity/Account/Register?returnUrl=%2F">Register as a new user</a>
+						</p>
+					</div>
+					<p>Note that for demo purposes you don't need to register and can login with these credentials:</p>
+					<p>User: <b>demouser@microsoft.com</b> OR <b>admin@microsoft.com</b></p>
+					<p>Password: <b>Pass@word1</b></p>
+				</form>
+			</section>
+		</div>
+	</div>
+</div>

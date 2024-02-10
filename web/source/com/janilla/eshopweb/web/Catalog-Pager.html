@@ -1,0 +1,17 @@
+<div class="esh-pager">
+	<div class="container-fluid">
+		<article class="esh-pager-wrapper row">
+			<nav>
+				<div class="col-md-2 col-xs-12">
+					<a class="esh-pager-item-left esh-pager-item--navigable esh-pager-item ${previous.enabledClass}" id="Previous" aria-label="Previous" href="${previous.uri}">Previous</a>
+				</div>
+				<div class="col-md-8 col-xs-12">
+					<span class="esh-pager-item">Showing ${items.current} of ${items.total} products - Page ${pages.current} - ${pages.total}</span>
+				</div>
+				<div class="col-md-2 col-xs-12">
+					<a class="esh-pager-item-right esh-pager-item--navigable esh-pager-item ${next.enabledClass}" id="Next" aria-label="Next" href="${next.uri}">Next</a>
+				</div>
+			</nav>
+		</article>
+	</div>
+</div>

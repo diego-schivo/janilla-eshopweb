@@ -1,0 +1,19 @@
+<form method="post" id="logoutForm" class="navbar-right" action="/Identity/Account/Logout">
+	<section class="esh-identity-section">
+		<div class="esh-identity-name">${user.userName}</div>
+		<img class="esh-identity-image" src="/arrow-down.png">
+	</section>
+	<section class="esh-identity-drop">
+		#{admin}
+		<a class="esh-identity-item" href="/order/my-orders">
+			<div class="esh-identity-name esh-identity-name--upper">My orders</div>
+		</a>
+		<a class="esh-identity-item" href="/manage/my-account">
+			<div class="esh-identity-name esh-identity-name--upper">My account</div>
+		</a>
+		<a class="esh-identity-item" href="javascript:document.getElementById('logoutForm').submit()">
+			<div class="esh-identity-name esh-identity-name--upper">Log Out</div>
+			<img class="esh-identity-image" src="/logout.png">
+		</a>
+	</section>
+</form>
