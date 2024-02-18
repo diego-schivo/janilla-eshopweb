@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.HexFormat;
 import java.util.Random;
+import java.util.Set;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -38,15 +39,15 @@ import com.janilla.persistence.Store;
 @Store
 public class ApplicationUser {
 
-	static Random random = new SecureRandom();
+	public static Random RANDOM = new SecureRandom();
 
 	public static void setHashAndSalt(ApplicationUser user, String password) {
 		var p = password.toCharArray();
 		var s = new byte[16];
-		random.nextBytes(s);
+		RANDOM.nextBytes(s);
 		var h = hash(p, s);
 		var f = HexFormat.of();
-		user.setHash(f.formatHex(h));
+		user.setPasswordHash(f.formatHex(h));
 		user.setSalt(f.formatHex(s));
 	}
 
@@ -55,7 +56,7 @@ public class ApplicationUser {
 		var f = HexFormat.of();
 		var s = f.parseHex(user.getSalt());
 		var h = f.formatHex(hash(p, s));
-		return h.equals(user.getHash());
+		return h.equals(user.getPasswordHash());
 	}
 
 	public static byte[] hash(char[] password, byte[] salt) {
@@ -77,11 +78,13 @@ public class ApplicationUser {
 
 	private String phoneNumber;
 
-	private String hash;
+	private String passwordHash;
 
 	private String salt;
 
 	private Collection<String> roles;
+
+	private TwoFactor twoFactor;
 
 	public long getId() {
 		return id;
@@ -115,12 +118,12 @@ public class ApplicationUser {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public String getHash() {
-		return hash;
+	public String getPasswordHash() {
+		return passwordHash;
 	}
 
-	public void setHash(String hash) {
-		this.hash = hash;
+	public void setPasswordHash(String passwordHash) {
+		this.passwordHash = passwordHash;
 	}
 
 	public String getSalt() {
@@ -137,5 +140,28 @@ public class ApplicationUser {
 
 	public void setRoles(Collection<String> roles) {
 		this.roles = roles;
+	}
+
+	public TwoFactor getTwoFactor() {
+		return twoFactor;
+	}
+
+	public void setTwoFactor(TwoFactor twoFactor) {
+		this.twoFactor = twoFactor;
+	}
+
+	public record TwoFactor(boolean enabled, String secretKey, Set<String> recoveryCodeHashes) {
+
+		public TwoFactor withEnabled(boolean enabled) {
+			return new TwoFactor(enabled, secretKey, recoveryCodeHashes);
+		}
+
+		public TwoFactor withSecretKey(String secretKey) {
+			return new TwoFactor(enabled, secretKey, recoveryCodeHashes);
+		}
+
+		public TwoFactor withRecoveryCodeHashes(Set<String> recoveryCodeHashes) {
+			return new TwoFactor(enabled, secretKey, recoveryCodeHashes);
+		}
 	}
 }

@@ -34,16 +34,13 @@ public class CatalogBrandApi {
 
 	Persistence persistence;
 
-	public Persistence getPersistence() {
-		return persistence;
-	}
-
 	public void setPersistence(Persistence persistence) {
 		this.persistence = persistence;
 	}
 
 	@Handle(method = "GET", uri = "/api/catalog-brands")
-	public Object list() throws IOException {
+	public Object list(EShopApiApp.HttpExchange exchange) throws IOException {
+		exchange.requireAdministrator();
 		var c = persistence.getCrud(CatalogBrand.class);
 		var i = c.list();
 		var r = c.read(i).toList();

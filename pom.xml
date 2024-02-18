@@ -3,36 +3,36 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.janilla</groupId>
-	<artifactId>eshopweb-parent</artifactId>
+	<artifactId>janilla-eshopweb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>com.janilla</groupId>
 			<artifactId>janilla</artifactId>
-			<version>0.0.9</version>
+			<version>0.0.11</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>com.janilla</groupId>
-				<artifactId>eshopweb-admin</artifactId>
+				<artifactId>janilla-eshopweb-admin</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>com.janilla</groupId>
-				<artifactId>eshopweb-api</artifactId>
+				<artifactId>janilla-eshopweb-api</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>com.janilla</groupId>
-				<artifactId>eshopweb-core</artifactId>
+				<artifactId>janilla-eshopweb-core</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>com.janilla</groupId>
-				<artifactId>eshopweb-web</artifactId>
+				<artifactId>janilla-eshopweb-web</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>

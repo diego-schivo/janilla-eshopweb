@@ -30,27 +30,35 @@ class MainLayout {
 
 	selector;
 
-	j;
+	user;
 
-	get administrator() {
-		return this.j?.claims.some(x => x.type === this.j.roleClaimType && x.value === 'Administrators');
-	}
+	api;
+
+//	get administrator() {
+//		return this.user?.claims.some(x => x.type === this.user.roleClaimType && x.value === 'Administrators');
+//	}
 
 	run = async () => {
-		const s = await fetch('/User');
-		this.j = s.ok ? await s.json() : null;
-		if (this.j?.isAuthenticated) {
+		const s = await fetch('/user');
+		this.user = s.ok ? await s.json() : null;
+		if (this.user) {
+			this.api = {
+				url: 'http://127.0.0.1:8081/api',
+				headers: {
+					Authorization: `Bearer ${this.user.token}`
+				}
+			};
 			const r = new Rendering();
 			this.selector().innerHTML = await r.render(this, 'MainLayout');
 			this.listen();
 		} else
-			location.href = '/Identity/Account/Login?returnUrl=%2fAdmin';
+			location.href = '/user/login?returnUrl=%2fAdmin';
 	}
 
 	render = async (key, rendering) => {
 		switch (key) {
 			case 'sidebar':
-				return this.administrator ? await rendering.render(this, 'MainLayout-sidebar') : null;
+				return this.user.roles.includes('Administrators') ? await rendering.render(this, 'MainLayout-sidebar') : null;
 
 			case 'navMenu':
 				this.navMenu = new NavMenu();
@@ -63,7 +71,7 @@ class MainLayout {
 				return this.toast;
 
 			case 'catalog':
-				if (this.administrator) {
+				if (this.user.roles.includes('Administrators')) {
 					this.catalog = new Catalog();
 					this.catalog.selector = () => this.selector().querySelector('.content').lastElementChild;
 					return this.catalog;

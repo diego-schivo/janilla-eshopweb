@@ -24,27 +24,28 @@
 package com.janilla.eshopweb.fullstack;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.eshopweb.admin.EShopOnWebAdmin;
-import com.janilla.eshopweb.api.EShopOnWebApi;
-import com.janilla.eshopweb.web.EShopOnWebWeb;
+import com.janilla.eshopweb.admin.EShopAdminApp;
+import com.janilla.eshopweb.api.EShopApiApp;
+import com.janilla.eshopweb.web.EShopWebApp;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.util.Lazy;
 import com.janilla.web.NotFoundException;
 
-public class EShopOnWebFullstack {
+public class EShopFullApp {
 
 	public static void main(String[] args) throws IOException {
 		var c = new Properties();
-		try (var s = EShopOnWebFullstack.class.getResourceAsStream("configuration.properties")) {
+		try (var s = EShopFullApp.class.getResourceAsStream("configuration.properties")) {
 			c.load(s);
 		}
 
-		var f = new EShopOnWebFullstack();
+		var f = new EShopFullApp();
 		f.setConfiguration(c);
 
 		var s = new HttpServer();
@@ -56,59 +57,58 @@ public class EShopOnWebFullstack {
 
 	Properties configuration;
 
-	Supplier<EShopOnWebWeb> web = Lazy.of(() -> {
-		var w = new EShopOnWebWeb();
+	Supplier<EShopWebApp> web = Lazy.of(() -> {
+		var w = new EShopWebApp();
 		w.setConfiguration(configuration);
 		return w;
 	});
 
-	Supplier<EShopOnWebAdmin> admin = Lazy.of(() -> {
-		var a = new EShopOnWebAdmin();
+	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
+		var a = new EShopAdminApp();
 		a.setConfiguration(configuration);
 		return a;
 	});
 
-	Supplier<EShopOnWebApi> api = Lazy.of(() -> {
-		var a = new EShopOnWebApi();
+	Supplier<EShopApiApp> api = Lazy.of(() -> {
+		var a = new EShopApiApp();
 		a.setConfiguration(configuration);
 		return a;
 	});
+
+	static ThreadLocal<IO.Consumer<HttpExchange>> currentHandler = new ThreadLocal<>();
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var h1 = getWeb().getHandler();
-		var h2 = getAdmin().getHandler();
-		var h3 = getApi().getHandler();
-		return c -> {
-//			var o = c.getException() != null ? c.getException() : c.getRequest();
-//			var h = switch (o) {
-//			case HttpRequest q -> {
-//				URI u;
-//				try {
-//					u = q.getURI();
-//				} catch (NullPointerException e) {
-//					u = null;
-//				}
-//				var p = u != null ? u.getPath() : null;
-//				if (p != null && (p.equals("/Admin") || p.startsWith("/admin.")))
-//					yield admin.get().getHandler();
-//				if (p != null && p.startsWith("/api/"))
-//					yield api.get().getHandler();
-//				yield web.get().getHandler();
-//			}
-//			case Exception e -> api.get().getHandler();
-//			default -> null;
-//			};
-//			h.accept(c);
+		var hh = List.of(getAdmin().getHandler(), getWeb().getHandler(), getApi().getHandler());
+		return e -> {
 			try {
-				h2.accept(c);
-			} catch (NotFoundException e) {
+				e.getRequest().getURI();
+//				System.out.println("u " + u);
+			} catch (NullPointerException f) {
+				f.printStackTrace();
+				return;
+			}
+			var h = currentHandler.get();
+			var n = h == null;
+			if (n)
+				h = hh.get(0);
+			for (;;) {
+				if (h == hh.get(1)) {
+					var f = getWeb().new HttpExchange();
+					f.setRequest(e.getRequest());
+					f.setResponse(e.getResponse());
+					f.setException(e.getException());
+					e = f;
+				}
+				currentHandler.set(h);
 				try {
-					var d = getWeb().newExchange();
-					d.setRequest(c.getRequest());
-					d.setResponse(c.getResponse());
-					h1.accept(d);
+					h.accept(e);
+					currentHandler.remove();
+					break;
 				} catch (NotFoundException f) {
-					h3.accept(c);
+					var i = n ? hh.indexOf(h) + 1 : -1;
+					h = i >= 0 && i < hh.size() ? hh.get(i) : null;
+					if (h == null)
+						break;
 				}
 			}
 		};
@@ -122,15 +122,15 @@ public class EShopOnWebFullstack {
 		this.configuration = configuration;
 	}
 
-	public EShopOnWebWeb getWeb() {
+	public EShopWebApp getWeb() {
 		return web.get();
 	}
 
-	public EShopOnWebAdmin getAdmin() {
+	public EShopAdminApp getAdmin() {
 		return admin.get();
 	}
 
-	public EShopOnWebApi getApi() {
+	public EShopApiApp getApi() {
 		return api.get();
 	}
 

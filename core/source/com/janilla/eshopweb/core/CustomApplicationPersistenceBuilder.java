@@ -63,7 +63,7 @@ public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceB
 					Other""".split("\n")) {
 				var z = new CatalogBrand();
 				z.setName(x);
-				p.getDatabase().performTransaction(() -> p.getCrud(CatalogBrand.class).create(z));
+				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogBrand.class).create(z), true);
 			}
 			for (var x : """
 					Mug
@@ -72,7 +72,7 @@ public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceB
 					USB Memory Stick""".split("\n")) {
 				var z = new CatalogType();
 				z.setName(x);
-				p.getDatabase().performTransaction(() -> p.getCrud(CatalogType.class).create(z));
+				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogType.class).create(z), true);
 			}
 			for (var x : """
 					2	2	.NET Bot Black Sweatshirt	.NET Bot Black Sweatshirt	19.5	/1.png
@@ -95,18 +95,19 @@ public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceB
 				z.setName(y[3]);
 				z.setPrice(new BigDecimal(y[4]));
 				z.setPictureUri(URI.create(y[5]));
-				p.getDatabase().performTransaction(() -> p.getCrud(CatalogItem.class).create(z));
+				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogItem.class).create(z), true);
 			}
 			for (var x : """
-					demouser@microsoft.com	demouser@microsoft.com	Pass@word1
-					admin@microsoft.com	admin@microsoft.com	Pass@word1	Administrators""".split("\n")) {
+					demouser@microsoft.com	Pass@word1
+					admin@microsoft.com	Pass@word1	Administrators""".split("\n")) {
 				var y = x.split("\t");
 				var z = new ApplicationUser();
 				z.setUserName(y[0]);
-				z.setEmail(y[1]);
-				ApplicationUser.setHashAndSalt(z, y[2]);
-				z.setRoles(IntStream.range(3, y.length).mapToObj(i -> y[i]).toList());
-				p.getDatabase().performTransaction(() -> p.getCrud(ApplicationUser.class).create(z));
+				z.setEmail(y[0]);
+				ApplicationUser.setHashAndSalt(z, y[1]);
+				z.setRoles(IntStream.range(2, y.length).mapToObj(i -> y[i]).toList());
+				z.setTwoFactor(new ApplicationUser.TwoFactor(false, null, null));
+				p.getDatabase().perform((ss, ii) -> p.getCrud(ApplicationUser.class).create(z), true);
 			}
 		}
 		return p;

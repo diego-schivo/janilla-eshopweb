@@ -47,6 +47,10 @@ class Catalog {
 
 	delete;
 
+	get layout() {
+		return this.rendering.stack[0].object;
+	}
+
 	render = async (key, rendering) => {
 		switch (key) {
 			case undefined:
@@ -119,7 +123,9 @@ class Catalog {
 
 	fetchItems = () => {
 		return Promise.all([
-			fetch('/api/catalog-items').then(s => s.json()).then(j => {
+			fetch(`${this.layout.api.url}/catalog-items`, {
+				headers: this.layout.api.headers
+			}).then(s => s.json()).then(j => {
 				this.catalogItems = j.catalogItems.map((a, i) => {
 					const q = new CatalogItem();
 					q.selector = () => this.selector().querySelector('tbody').children[i];
@@ -128,8 +134,14 @@ class Catalog {
 				});
 				return j.pageCount;
 			}),
-			fetch('/api/catalog-types').then(s => s.json()).then(j => this.catalogTypes = j.catalogTypes),
-			fetch('/api/catalog-brands').then(s => s.json()).then(j => this.catalogBrands = j.catalogBrands)
+
+			fetch(`${this.layout.api.url}/catalog-types`, {
+				headers: this.layout.api.headers
+			}).then(s => s.json()).then(j => this.catalogTypes = j.catalogTypes),
+
+			fetch(`${this.layout.api.url}/catalog-brands`, {
+				headers: this.layout.api.headers
+			}).then(s => s.json()).then(j => this.catalogBrands = j.catalogBrands)
 		]);
 	}
 

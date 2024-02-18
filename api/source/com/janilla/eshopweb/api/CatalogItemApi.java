@@ -37,16 +37,13 @@ public class CatalogItemApi {
 
 	Persistence persistence;
 
-	public Persistence getPersistence() {
-		return persistence;
-	}
-
 	public void setPersistence(Persistence persistence) {
 		this.persistence = persistence;
 	}
 
 	@Handle(method = "GET", uri = "/api/catalog-items")
-	public Object list() throws IOException {
+	public Object list(EShopApiApp.HttpExchange exchange) throws IOException {
+		exchange.requireAdministrator();
 		var c = persistence.getCrud(CatalogItem.class);
 		var i = c.list();
 		var j = c.read(i).toList();
@@ -54,25 +51,26 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "POST", uri = "/api/catalog-items")
-	public Object create(CatalogItem item) throws IOException {
+	public Object create(CatalogItem item, EShopApiApp.HttpExchange exchange) throws IOException {
+		exchange.requireAdministrator();
 		item.setPictureUri(URI.create("/eCatalog-item-default.png"));
 		var c = persistence.getCrud(CatalogItem.class);
-		var i = persistence.getDatabase().performTransaction(() -> c.create(item));
+		var i = c.create(item);
 		return Map.of("catalogItem", i);
 	}
 
 	@Handle(method = "PUT", uri = "/api/catalog-items")
-	public Object update(CatalogItem item) throws IOException {
+	public Object update(CatalogItem item, EShopApiApp.HttpExchange exchange) throws IOException {
+		exchange.requireAdministrator();
 		var c = persistence.getCrud(CatalogItem.class);
-		var i = persistence.getDatabase().performTransaction(() -> c.update(item.getId(),
-				x -> Reflection.copy(item, x, y -> !Set.of("id", "pictureUri").contains(y))));
+		var i = c.update(item.getId(), x -> Reflection.copy(item, x, y -> !Set.of("id", "pictureUri").contains(y)));
 		return Map.of("catalogItem", i);
 	}
 
 	@Handle(method = "DELETE", uri = "/api/catalog-items/(\\d+)")
-	public Object delete(long id) throws IOException {
-		var c = persistence.getCrud(CatalogItem.class);
-		persistence.getDatabase().performTransaction(() -> c.delete(id));
+	public Object delete(long id, EShopApiApp.HttpExchange exchange) throws IOException {
+		exchange.requireAdministrator();
+		persistence.getCrud(CatalogItem.class).delete(id);
 		return Map.of("status", "Deleted");
 	}
 }

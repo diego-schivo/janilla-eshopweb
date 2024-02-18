@@ -33,12 +33,10 @@ import com.janilla.web.MethodArgumentsResolver;
 public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
 
 	@Override
-	protected Object resolveArgument(Type type, HttpExchange context, Supplier<String[]> values,
+	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
 			EntryList<String, String> entries, String body) {
-//		if (type == Basket.class)
-//			return ((CustomExchangeContext) context).getBasket();
-//		if (type == ApplicationUser.class)
-//			return ((CustomExchangeContext) context).getUser();
-		return super.resolveArgument(type, context, values, entries, body);
+		if (type == EShopWebApp.HttpExchange.class)
+			return (EShopWebApp.HttpExchange) exchange;
+		return super.resolveArgument(type, exchange, values, entries, body);
 	}
 }

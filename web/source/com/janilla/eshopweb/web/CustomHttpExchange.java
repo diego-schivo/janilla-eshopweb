@@ -27,20 +27,19 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
 import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.eshopweb.core.Basket;
+import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
 import com.janilla.io.IO;
 import com.janilla.json.Jwt;
-import com.janilla.net.Net;
 import com.janilla.persistence.Persistence;
+import com.janilla.web.UnauthenticatedException;
 
 class CustomHttpExchange extends HttpExchange {
 
@@ -48,54 +47,55 @@ class CustomHttpExchange extends HttpExchange {
 
 	Persistence persistence;
 
+	private boolean authenticateUser;
+
 	private IO.Supplier<ApplicationUser> user = IO.Lazy.of(() -> {
+		var c = persistence.getCrud(ApplicationUser.class);
 		Map<String, ?> p;
 		{
-			var c = getRequest().getHeaders().get("Cookie");
-			var t = c != null ? Net.parseCookieHeader(c).get("EshopIdentifier") : null;
+			var t = getUserCookie();
+//			System.out.println("t=" + t);
 			try {
-				p = t != null ? Jwt.verifyToken(t, configuration.getProperty("eshopweb.web.jwt.key")) : null;
+				p = t != null ? Jwt.verifyToken(t, configuration.getProperty("eshopweb.jwt.key")) : null;
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				p = null;
 			}
 		}
-		var e = p != null ? (String) p.get("loggedInAs") : null;
-		var c = persistence.getCrud(ApplicationUser.class);
+		var e = p != null /* && (Long) p.get("exp") < Instant.now().getEpochSecond() */ ? (String) p.get("sub") : null;
 		var i = e != null ? c.find("email", e) : -1;
-		var u = i >= 0 ? c.read(i) : null;
+		var u = i > 0 ? c.read(i) : null;
+		if (authenticateUser) {
+			if (u == null)
+				throw new UnauthenticatedException();
+			if (u.getTwoFactor().enabled() && !((Boolean) p.get("twoFactorAuthenticated")))
+				throw new TwoFactorAuthenticationException();
+		}
 		return u;
 	});
 
 	private boolean createBasket;
 
 	private IO.Supplier<Basket> basket = IO.Lazy.of(() -> {
-		var u = getUser();
+		var u = getUser(false);
 		var i = u != null ? u.getUserName() : null;
-		if (i == null) {
-			var c = getRequest().getHeaders().get("Cookie");
-			i = c != null ? Net.parseCookieHeader(c).get("eShop") : null;
-		}
+		if (i == null)
+			i = getBasketCookie();
 		var c = persistence.getCrud(Basket.class);
 		var b = i != null ? c.read(c.find("buyer", i)) : null;
 		if (b == null && createBasket) {
 			var d = new Basket();
 			d.setBuyer(u != null ? u.getUserName() : UUID.randomUUID().toString());
-			persistence.getDatabase().performTransaction(() -> c.create(d));
+			c.create(d);
 			b = d;
 			if (u == null)
-				getResponse()
-						.getHeaders().add(
-								"Set-Cookie", "eShop="
-										+ b.getBuyer() + "; expires=" + ZonedDateTime.now(ZoneOffset.UTC)
-												.truncatedTo(ChronoUnit.DAYS).plusYears(10).format(DateTimeFormatter
-														.ofPattern("EEE, dd MMM yyyy HH:mm:ss O", Locale.ENGLISH))
-										+ "; path=/; samesite=strict");
+				addBasketCookie(b.getBuyer());
 		}
 		return b;
 	});
 
-	public ApplicationUser getUser() {
+	public ApplicationUser getUser(boolean authenticate) {
+		authenticateUser = authenticate;
 		try {
 			return user.get();
 		} catch (IOException e) {
@@ -110,5 +110,39 @@ class CustomHttpExchange extends HttpExchange {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	static String BASKET_COOKIE = "eShop";
+
+	public void addBasketCookie(String value) {
+		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, value,
+				ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS).plusYears(10), "/", "strict"));
+	}
+
+	public String getBasketCookie() {
+		var c = getRequest().getHeaders().get("Cookie");
+		return c != null ? Http.parseCookieHeader(c).get(BASKET_COOKIE) : null;
+	}
+
+	public void removeBasketCookie() {
+		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, null,
+				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict"));
+	}
+
+	static String USER_COOKIE = "EshopIdentifier";
+
+	public void addUserCookie(String value) {
+		getResponse().getHeaders().add("Set-Cookie",
+				Http.formatSetCookieHeader(USER_COOKIE, value, null, "/", "strict"));
+	}
+
+	public String getUserCookie() {
+		var c = getRequest().getHeaders().get("Cookie");
+		return c != null ? Http.parseCookieHeader(c).get(USER_COOKIE) : null;
+	}
+
+	public void removeUserCookie() {
+		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, null,
+				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict"));
 	}
 }

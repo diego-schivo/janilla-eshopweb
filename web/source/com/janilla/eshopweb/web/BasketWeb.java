@@ -45,24 +45,22 @@ public class BasketWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/Basket")
-	public Object show(HttpExchange exchange) throws IOException {
+	@Handle(method = "GET", uri = "/basket")
+	public BasketPage getBasket(HttpExchange exchange) throws IOException {
+		var b = ((CustomHttpExchange) exchange).getBasket(true);
 		var c1 = persistence.getCrud(BasketItem.class);
 		var c2 = persistence.getCrud(CatalogItem.class);
-		var b = ((CustomHttpExchange) exchange).getBasket(false);
-		if (b == null)
-			return null;
 		var i = new ArrayList<Item>();
 		for (var j = c1.read(c1.filter("basket", b.getId())).iterator(); j.hasNext();) {
 			var i1 = j.next();
 			var i2 = c2.read(i1.getCatalogItem());
 			i.add(new Item(i.size(), i1, i2));
 		}
-		return new View(i);
+		return new BasketPage(i);
 	}
 
-	@Handle(method = "POST", uri = "/Basket")
-	public Object addItem(@Parameter(name = "id") Long id, HttpExchange exchange) throws IOException {
+	@Handle(method = "POST", uri = "/basket")
+	public URI addItem(@Parameter(name = "id") Long id, HttpExchange exchange) throws IOException {
 		var i = persistence.getCrud(CatalogItem.class).read(id);
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
 
@@ -71,15 +69,15 @@ public class BasketWeb {
 		j.setUnitPrice(i.getPrice());
 		j.setQuantity(1);
 		j.setBasket(b.getId());
-		persistence.getDatabase().performTransaction(() -> persistence.getCrud(BasketItem.class).create(j));
+		persistence.getCrud(BasketItem.class).create(j);
 
-		return URI.create("/Basket");
+		return URI.create("/basket");
 	}
 
-	@Handle(method = "POST", uri = "/Basket/Update")
-	public Object update(View view) throws IOException {
+	@Handle(method = "POST", uri = "/basket/update")
+	public URI update(BasketPage view) throws IOException {
 		var c = persistence.getCrud(BasketItem.class);
-		persistence.getDatabase().performTransaction(() -> {
+		persistence.getDatabase().perform((ss, ii) -> {
 			for (var i : view.items) {
 				var q = i.basketItem.getQuantity();
 				if (q > 0)
@@ -87,12 +85,34 @@ public class BasketWeb {
 				else
 					c.delete(i.basketItem.getId());
 			}
-		});
-		return URI.create("/Basket");
+			return null;
+		}, true);
+		return URI.create("/basket");
 	}
 
 	@Render(template = "Basket.html")
-	public record View(List<Item> items) {
+	public record BasketPage(List<Item> items) implements Page {
+
+		@Override
+		public String title() {
+			return "Basket";
+		}
+
+		public Empty empty() {
+			return items.isEmpty() ? new Empty() : null;
+		}
+
+		public Form form() {
+			return !items.isEmpty() ? new Form(items) : null;
+		}
+	}
+
+	@Render(template = "Basket-Empty.html")
+	public record Empty() {
+	}
+
+	@Render(template = "Basket-Form.html")
+	public record Form(List<Item> items) {
 
 		public BigDecimal total() {
 			return items.stream().map(x -> x.price()).reduce(BigDecimal.ZERO, BigDecimal::add);

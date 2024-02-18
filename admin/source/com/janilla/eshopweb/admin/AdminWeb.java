@@ -26,14 +26,14 @@ package com.janilla.eshopweb.admin;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
-public class Admin {
+public class AdminWeb {
 
-	@Handle(method = "GET", uri = "/Admin")
-	public Object show() {
-		return new View();
+	@Handle(method = "GET", uri = "/admin")
+	public Admin getAdmin() {
+		return new Admin();
 	}
 
 	@Render(template = "Admin.html")
-	public record View() {
+	public record Admin() {
 	}
 }

@@ -42,8 +42,9 @@ class Delete {
 	}
 
 	listen = () => {
-		this.selector().querySelectorAll('.close, .btn-secondary').forEach(x => x.addEventListener('click', this.handleCloseClick));
-		this.selector().querySelector('.btn-danger').addEventListener('click', this.handleDeleteClick);
+		const e = this.selector();
+		e.querySelectorAll('.close, .btn-secondary').forEach(x => x.addEventListener('click', this.handleCloseClick));
+		e.querySelector('.btn-danger').addEventListener('click', this.handleDeleteClick);
 	}
 
 	refresh = async () => {

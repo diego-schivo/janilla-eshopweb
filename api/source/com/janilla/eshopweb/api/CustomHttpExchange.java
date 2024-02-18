@@ -26,65 +26,45 @@ package com.janilla.eshopweb.api;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Properties;
-import java.util.function.Supplier;
 
-import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
+import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
-import com.janilla.util.Lazy;
-import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.ForbiddenException;
+import com.janilla.web.UnauthenticatedException;
 
-public class EShopOnWebApi {
+class CustomHttpExchange extends HttpExchange {
 
-	public static void main(String[] args) throws IOException {
-		var p = new Properties();
-		try (var s = EShopOnWebApi.class.getResourceAsStream("configuration.properties")) {
-			p.load(s);
-		}
+	Properties configuration;
 
-		var a = new EShopOnWebApi();
-		a.setConfiguration(p);
-		a.getPersistence();
+	Persistence persistence;
 
-		var s = new HttpServer();
-		s.setPort(Integer.parseInt(p.getProperty("eshopweb.api.http.port")));
-		s.setHandler(a.getHandler());
-		s.run();
-	}
-
-	private Properties configuration;
-
-	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomApplicationPersistenceBuilder();
-		b.setApplication(this);
-		return b.build();
+	private IO.Supplier<ApplicationUser> user = IO.Lazy.of(() -> {
+		var a = getRequest().getHeaders().get("Authorization");
+		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
+		var p = t != null ? Jwt.verifyToken(t, configuration.getProperty("eshopweb.jwt.key")) : null;
+		var e = p != null ? (String) p.get("sub") : null;
+		var c = persistence.getCrud(ApplicationUser.class);
+		var i = e != null ? c.find("email", e) : -1;
+		var u = i >= 0 ? c.read(i) : null;
+		return u;
 	});
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new ApplicationHandlerBuilder();
-		b.setApplication(this);
-		return b.build();
-	});
-
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
-
-	public Persistence getPersistence() {
+	public ApplicationUser getUser() {
 		try {
-			return persistence.get();
+			return user.get();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
-		return handler.get();
+	public void requireAdministrator() {
+		var u = getUser();
+		if (u == null)
+			throw new UnauthenticatedException();
+		if (!u.getRoles().contains("Administrators"))
+			throw new ForbiddenException();
 	}
 }

@@ -1,0 +1,30 @@
+<div class="container account-login-container">
+	<h2>Recovery code verification</h2>
+	<hr />
+	<p>
+		You have requested to log in with a recovery code.
+		This login will not be remembered until you provide an authenticator app code at log in or disable 2FA and log in again.
+	</p>
+	<div class="row">
+		<div class="col-md-12">
+			<section>
+				<form method="post">
+					<hr />
+					<div class="text-danger validation-summary-valid" data-valmsg-summary="true">
+						<ul>
+							<li style="display: none"></li>
+						</ul>
+					</div>
+					<div class="form-group">
+						<label for="code">Recovery Code</label>
+						<input class="form-control" type="text" id="code" name="code" value="" />
+						<span class="text-danger field-validation-valid"></span>
+					</div>
+					<div class="form-group">
+						<button type="submit" class="btn btn-default">Log in</button>
+					</div>
+				</form>
+			</section>
+		</div>
+	</div>
+</div>

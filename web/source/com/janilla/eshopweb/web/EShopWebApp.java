@@ -25,29 +25,31 @@ package com.janilla.eshopweb.web;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
-import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
+import com.janilla.web.NotFoundException;
 
-public class EShopOnWebWeb {
+public class EShopWebApp {
 
 	public static void main(String[] args) throws IOException {
 		var p = new Properties();
-		try (var s = EShopOnWebWeb.class.getResourceAsStream("configuration.properties")) {
+		try (var s = EShopWebApp.class.getResourceAsStream("configuration.properties")) {
 			p.load(s);
 		}
 
-		var a = new EShopOnWebWeb();
+		var a = new EShopWebApp();
 		a.setConfiguration(p);
 		a.getPersistence();
 
-		var s = new CustomHttpServer();
-		s.eShopOnWeb = a;
+		var s = new HttpServer();
 		s.setPort(Integer.parseInt(p.getProperty("eshopweb.web.http.port")));
 		s.setHandler(a.getHandler());
 		s.run();
@@ -61,10 +63,51 @@ public class EShopOnWebWeb {
 		return b.build();
 	});
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
+	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
+		var a = new EShopAdminApp();
+		a.setConfiguration(configuration);
+		return a;
+	});
+
+	static ThreadLocal<IO.Consumer<com.janilla.http.HttpExchange>> currentHandler = new ThreadLocal<>();
+
+	Supplier<IO.Consumer<com.janilla.http.HttpExchange>> handler = Lazy.of(() -> {
 		var b = new CustomApplicationHandlerBuilder();
-		b.setApplication(EShopOnWebWeb.this);
-		return b.build();
+		b.setApplication(EShopWebApp.this);
+		var hh = List.of(getAdmin().getHandler(), b.build());
+		return e -> {
+			try {
+				e.getRequest().getURI();
+//				System.out.println("u " + u);
+			} catch (NullPointerException f) {
+				f.printStackTrace();
+				return;
+			}
+			var h = currentHandler.get();
+			var n = h == null;
+			if (n)
+				h = hh.get(0);
+			for (;;) {
+				if (h == hh.get(1)) {
+					var f = new HttpExchange();
+					f.setRequest(e.getRequest());
+					f.setResponse(e.getResponse());
+					f.setException(e.getException());
+					e = f;
+				}
+				currentHandler.set(h);
+				try {
+					h.accept(e);
+					currentHandler.remove();
+					break;
+				} catch (NotFoundException f) {
+					var i = n ? hh.indexOf(h) + 1 : -1;
+					if (i < 0 || i >= hh.size())
+						break;
+					h = hh.get(i);
+				}
+			}
+		};
 	});
 
 	public Properties getConfiguration() {
@@ -83,14 +126,18 @@ public class EShopOnWebWeb {
 		}
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public EShopAdminApp getAdmin() {
+		return admin.get();
+	}
+
+	public IO.Consumer<com.janilla.http.HttpExchange> getHandler() {
 		return handler.get();
 	}
 
-	public HttpExchange newExchange() {
-		var c = new CustomHttpExchange();
-		c.configuration = getConfiguration();
-		c.persistence = getPersistence();
-		return c;
+	public class HttpExchange extends CustomHttpExchange {
+		{
+			configuration = getConfiguration();
+			persistence = getPersistence();
+		}
 	}
 }

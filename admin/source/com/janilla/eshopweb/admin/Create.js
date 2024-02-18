@@ -82,8 +82,9 @@ class Create {
 	}
 
 	listen = () => {
-		this.selector().querySelectorAll('.close, .btn-secondary').forEach(x => x.addEventListener('click', this.handleCloseClick));
-		this.selector().querySelector('form').addEventListener('submit', this.handleFormSubmit);
+		const e = this.selector();
+		e.querySelectorAll('.close, .btn-secondary').forEach(x => x.addEventListener('click', this.handleCloseClick));
+		e.querySelector('form').addEventListener('submit', this.handleFormSubmit);
 	}
 
 	refresh = async () => {

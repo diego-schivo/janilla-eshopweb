@@ -25,14 +25,58 @@ class NavMenu {
 
 	selector;
 
+	rendering;
+
+	get items() {
+		const i = [
+			{
+				text: 'Home',
+				href: 'admin',
+				iconClass: 'oi-home'
+			},
+			{
+				text: this.layout.user.username,
+				href: 'account/profile',
+				iconClass: 'oi-person'
+			},
+			{
+				text: 'Logout',
+				href: 'logout',
+				iconClass: 'oi-account-logout'
+			}
+		];
+		const j = i.find(x => `/${x.href}` === location.pathname);
+		if (j) {
+			j.activeClass = 'active';
+			j.currentAttribute = 'aria-current="page"';
+		}
+		return i;
+	}
+
+	get layout() {
+		return this.rendering.stack[0].object;
+	}
+
 	render = async (key, rendering) => {
 		switch (key) {
 			case undefined:
+				this.rendering = rendering.clone();
 				return await rendering.render(this, 'NavMenu');
 		}
+
+		if (rendering.stack.at(-2).key === 'items')
+			return await rendering.render(rendering.object[key], 'NavMenu-Item');
 	}
 
 	listen = () => {
+		this.selector().querySelector('[href="logout"]').addEventListener('click', this.handleLogoutClick);
+	}
+
+	handleLogoutClick = async e => {
+		e.preventDefault();
+		const s = await fetch('/user/logout', { method: 'POST' });
+		if (s.ok)
+			location.href = '/user/login';
 	}
 }
 

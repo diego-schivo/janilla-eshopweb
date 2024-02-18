@@ -26,12 +26,11 @@ package com.janilla.eshopweb.web;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
-import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.eshopweb.core.Order;
 import com.janilla.eshopweb.core.OrderItem;
+import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.ForbiddenException;
 import com.janilla.web.Handle;
@@ -45,34 +44,34 @@ public class OrderWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/order/my-orders")
-	public Object show(ApplicationUser user) throws IOException {
-		if (user == null)
-			return URI.create("/Identity/Account/Login");
+	@Handle(method = "GET", uri = "/order/history")
+	public History getHistory(HttpExchange exchange) throws IOException {
+		var e = (CustomHttpExchange) exchange;
+		var u = e.getUser(true);
 		var c = persistence.getCrud(Order.class);
 		var d = persistence.getCrud(OrderItem.class);
-		var i = c.read(c.filter("buyer", user.getUserName())).map(o -> {
+		var i = c.read(c.filter("buyer", u.getUserName())).map(o -> {
 			try {
 				var t = d.read(d.filter("order", o.getId())).reduce(BigDecimal.ZERO,
 						(a, b) -> a.add(b.getUnitPrice().multiply(BigDecimal.valueOf(b.getUnits()))), (a, b) -> a);
-				return new View.Item(o, t);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				return new History.Item(o, t);
+			} catch (IOException f) {
+				throw new UncheckedIOException(f);
 			}
 		}).toList();
-		return new View(i);
+		return new History(i);
 	}
 
 	@Handle(method = "GET", uri = "/order/detail/(\\d+)")
-	public Object show(long id, ApplicationUser user) throws IOException {
-		if (user == null)
-			return URI.create("/Identity/Account/Login");
+	public Detail getDetail(long id, HttpExchange exchange) throws IOException {
+		var e = (CustomHttpExchange) exchange;
+		var u = e.getUser(true);
 		Order o;
 		{
 			var c = persistence.getCrud(Order.class);
 			o = c.read(id);
 		}
-		if (!o.getBuyer().equals(user.getUserName()))
+		if (!o.getBuyer().equals(u.getUserName()))
 			throw new ForbiddenException();
 		var c = persistence.getCrud(OrderItem.class);
 		var i = c.read(c.filter("order", o.getId())).toList();
@@ -82,18 +81,28 @@ public class OrderWeb {
 		return new Detail(o, t, j);
 	}
 
-	@Render(template = "MyOrders.html")
-	public record View(Collection<Item> items) {
+	@Render(template = "Order-History.html")
+	public record History(List<Item> items) implements Page {
 
-		@Render(template = "MyOrders-Item.html")
+		@Override
+		public String title() {
+			return "My Order History";
+		}
+
+		@Render(template = "Order-History-Item.html")
 		public record Item(Order order, BigDecimal total) {
 		}
 	}
 
-	@Render(template = "Detail.html")
-	public record Detail(Order order, BigDecimal total, Collection<Item> items) {
+	@Render(template = "Order-Detail.html")
+	public record Detail(Order order, BigDecimal total, List<Item> items) implements Page {
 
-		@Render(template = "Detail-Item.html")
+		@Override
+		public String title() {
+			return "Order Detail";
+		}
+
+		@Render(template = "Order-Detail-Item.html")
 		public record Item(OrderItem item, BigDecimal total) {
 		}
 	}

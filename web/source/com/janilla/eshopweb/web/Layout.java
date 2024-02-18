@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.frontend.RenderEngine;
@@ -34,38 +37,45 @@ import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
 @Render(template = "Layout.html")
-public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.html") int basket,
-		Object content) implements Renderer {
+public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.html") int basket, Page page)
+		implements Renderer {
 
 	public Login login() {
 		return user == null ? new Login() : null;
 	}
 
-	public Logout logout() {
-		return user != null ? new Logout(user) : null;
+	public Form form() {
+		return user != null ? new Form(user) : null;
 	}
 
-	static Format currencyFormat = new DecimalFormat("0.00");
+	protected static Format currencyFormat = new DecimalFormat("0.00");
+
+	protected static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss xxx")
+			.withZone(ZoneOffset.UTC);
 
 	@Override
 	public Object render(RenderEngine engine) throws IOException {
-		if (engine.getObject() instanceof BigDecimal x)
-			return currencyFormat.format(x);
-		return CANNOT_RENDER;
+		var o = engine.getObject();
+		return o != null ? switch (o) {
+		case BigDecimal x -> currencyFormat.format(x);
+		case Instant x -> dateTimeFormatter.format(x);
+		default -> CANNOT_RENDER;
+		} : CANNOT_RENDER;
 	}
 
 	@Render(template = "Layout-Login.html")
 	public record Login() {
 	}
 
-	@Render(template = "Layout-Logout.html")
-	public record Logout(ApplicationUser user) {
+	@Render(template = "Layout-Form.html")
+	public record Form(ApplicationUser user) {
 
 		public Admin admin() {
-			return user.getRoles().contains("Administrators") ? new Admin() : null;
+			var r = user.getRoles();
+			return r != null && r.contains("Administrators") ? new Admin() : null;
 		}
 
-		@Render(template = "Layout-Logout-Admin.html")
+		@Render(template = "Layout-Form-Admin.html")
 		public record Admin() {
 		}
 	}

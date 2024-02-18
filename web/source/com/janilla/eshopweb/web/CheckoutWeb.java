@@ -24,20 +24,22 @@
 package com.janilla.eshopweb.web;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.net.URI;
 import java.time.Instant;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.janilla.eshopweb.core.Address;
-import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.eshopweb.core.Basket;
 import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.eshopweb.core.CatalogItem;
 import com.janilla.eshopweb.core.CatalogItemOrdered;
 import com.janilla.eshopweb.core.Order;
 import com.janilla.eshopweb.core.OrderItem;
+import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
@@ -50,64 +52,105 @@ public class CheckoutWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/Basket/Checkout")
-	public Object show(Basket basket) throws IOException {
-		var c = persistence.getCrud(BasketItem.class);
-		var i = c.read(c.filter("basket", basket.getId())).map(x -> {
-			try {
-				var y = persistence.getCrud(CatalogItem.class).read(x.getCatalogItem());
-				return new View.Item(x, y);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		}).toList();
-		return new View(basket, i);
+	@Handle(method = "GET", uri = "/basket/checkout")
+	public Checkout getCheckout(HttpExchange exchange) throws IOException {
+		var e = (CustomHttpExchange) exchange;
+		e.getUser(true);
+		var b = e.getBasket(false);
+		var c1 = persistence.getCrud(BasketItem.class);
+		var c2 = persistence.getCrud(CatalogItem.class);
+		var i = new ArrayList<Item>();
+		for (var j = c1.read(c1.filter("basket", b.getId())).iterator(); j.hasNext();) {
+			var i1 = j.next();
+			var i2 = c2.read(i1.getCatalogItem());
+			i.add(new Item(i1, i2));
+		}
+		return new Checkout(i);
 	}
 
-	@Handle(method = "POST", uri = "/Basket/Checkout")
-	public Object pay(Basket basket, ApplicationUser user) throws IOException {
+	@Handle(method = "POST", uri = "/basket/checkout")
+	public URI pay(HttpExchange exchange) throws IOException {
+		var e = (CustomHttpExchange) exchange;
+		var b = e.getBasket(false);
 		var o = new Order();
-		o.setBuyer(user.getUserName());
+		o.setBuyer(b.getBuyer());
 		o.setOrderDate(Instant.now());
 		o.setShipToAddress(new Address("123 Main St.", "Kent", "OH", "United States", "44240"));
-		Map<BasketItem, CatalogItem> m;
+		Map<BasketItem, CatalogItem> m = new HashMap<>();
 		{
 			var c = persistence.getCrud(BasketItem.class);
-			var d = persistence.getCrud(CatalogItem.class);
-			m = c.read(c.filter("basket", basket.getId())).collect(Collectors.toMap(x -> x, x -> {
-				try {
-					return d.read(x.getCatalogItem());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			}));
-		}
-		persistence.getDatabase().performTransaction(() -> {
-			persistence.getCrud(Order.class).create(o);
-			for (var e : m.entrySet()) {
-				var bi = e.getKey();
-				var ci = e.getValue();
-				var oi = new OrderItem();
-				oi.setOrder(o.getId());
-				oi.setItemOrdered(new CatalogItemOrdered(ci.getId(), ci.getName(), ci.getPictureUri()));
-				oi.setUnitPrice(bi.getUnitPrice());
-				oi.setUnits(bi.getQuantity());
-				persistence.getCrud(OrderItem.class).create(oi);
+			for (var j = c.read(c.filter("basket", b.getId())).iterator(); j.hasNext();) {
+				var i1 = j.next();
+				var i2 = persistence.getCrud(CatalogItem.class).read(i1.getCatalogItem());
+				m.put(i1, i2);
 			}
-			persistence.getCrud(Basket.class).delete(basket.getId());
-		});
+		}
+		persistence.getDatabase().perform((ss, ii) -> {
+			persistence.getCrud(Order.class).create(o);
+			for (var f : m.entrySet()) {
+				var i1 = f.getKey();
+				var i2 = f.getValue();
+				var i3 = new OrderItem();
+				i3.setOrder(o.getId());
+				i3.setItemOrdered(new CatalogItemOrdered(i2.getId(), i2.getName(), i2.getPictureUri()));
+				i3.setUnitPrice(i1.getUnitPrice());
+				i3.setUnits(i1.getQuantity());
+				persistence.getCrud(OrderItem.class).create(i3);
+			}
+			persistence.getCrud(Basket.class).delete(b.getId());
+			return null;
+		}, true);
+		return URI.create("/basket/success");
+	}
+
+	@Handle(method = "GET", uri = "/basket/success")
+	public Success getSuccess() {
 		return new Success();
 	}
 
 	@Render(template = "Checkout.html")
-	public record View(Basket basket, Collection<Item> items) {
+	public record Checkout(List<Item> items) implements Page {
 
-		@Render(template = "Checkout-Item.html")
-		public record Item(BasketItem basketItem, CatalogItem catalogItem) {
+		@Override
+		public String title() {
+			return "Basket";
+		}
+
+		public Empty empty() {
+			return items.isEmpty() ? new Empty() : null;
+		}
+
+		public Form form() {
+			return !items.isEmpty() ? new Form(items) : null;
 		}
 	}
 
-	@Render(template = "Success.html")
-	public record Success() {
+	@Render(template = "Checkout-Empty.html")
+	public record Empty() {
+	}
+
+	@Render(template = "Checkout-Form.html")
+	public record Form(List<Item> items) {
+
+		public BigDecimal total() {
+			return items.stream().map(x -> x.price()).reduce(BigDecimal.ZERO, BigDecimal::add);
+		}
+	}
+
+	@Render(template = "Checkout-Item.html")
+	public record Item(BasketItem basketItem, CatalogItem catalogItem) {
+
+		public BigDecimal price() {
+			return basketItem.getUnitPrice().multiply(BigDecimal.valueOf(basketItem.getQuantity()));
+		}
+	}
+
+	@Render(template = "Checkout-Success.html")
+	public record Success() implements Page {
+
+		@Override
+		public String title() {
+			return "Checkout Complete";
+		}
 	}
 }

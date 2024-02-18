@@ -27,5 +27,5 @@ module com.janilla.eshopweb.web {
 
 	opens com.janilla.eshopweb.web;
 
-	requires transitive com.janilla.eshopweb.core;
+	requires transitive com.janilla.eshopweb.admin;
 }

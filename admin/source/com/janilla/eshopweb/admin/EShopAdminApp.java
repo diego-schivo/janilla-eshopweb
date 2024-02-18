@@ -33,15 +33,15 @@ import com.janilla.io.IO;
 import com.janilla.util.Lazy;
 import com.janilla.web.ApplicationHandlerBuilder;
 
-public class EShopOnWebAdmin {
+public class EShopAdminApp {
 
 	public static void main(String[] args) throws IOException {
 		var p = new Properties();
-		try (var s = EShopOnWebAdmin.class.getResourceAsStream("configuration.properties")) {
+		try (var s = EShopAdminApp.class.getResourceAsStream("configuration.properties")) {
 			p.load(s);
 		}
 
-		var a = new EShopOnWebAdmin();
+		var a = new EShopAdminApp();
 		a.setConfiguration(p);
 //		a.getPersistence();
 
@@ -56,7 +56,7 @@ public class EShopOnWebAdmin {
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
 		var b = new ApplicationHandlerBuilder();
-		b.setApplication(EShopOnWebAdmin.this);
+		b.setApplication(EShopAdminApp.this);
 		return b.build();
 	});
 

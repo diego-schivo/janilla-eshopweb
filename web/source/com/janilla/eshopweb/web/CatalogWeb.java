@@ -25,7 +25,7 @@ package com.janilla.eshopweb.web;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -46,7 +46,7 @@ public class CatalogWeb {
 	}
 
 	@Handle(method = "GET", uri = "/")
-	public Object show(@Parameter(name = "brand") long brand, @Parameter(name = "type") long type,
+	public Catalog getCatalog(@Parameter(name = "brand") long brand, @Parameter(name = "type") long type,
 			@Parameter(name = "page") int page) throws IOException {
 		var c1 = persistence.getCrud(CatalogBrand.class);
 		var b = Stream
@@ -73,16 +73,21 @@ public class CatalogWeb {
 				new PageAndEnabled(page + 1, (page + 1) * 10 < p.total()));
 		var i = c3.read(p.ids()).toList();
 
-		return new View(f, q, i);
+		return new Catalog(f, q, i);
 	}
 
 	@Render(template = "Catalog.html")
-	public record View(Filters filters, Pager pager,
-			Collection<@Render(template = "CatalogItem.html") CatalogItem> items) {
+	public record Catalog(Filters filters, Pager pager, List<@Render(template = "CatalogItem.html") CatalogItem> items)
+			implements Page {
+
+		@Override
+		public String title() {
+			return "Catalog";
+		}
 	}
 
 	@Render(template = "Catalog-Filters.html")
-	public record Filters(Collection<Option> brandOptions, Collection<Option> typeOptions) {
+	public record Filters(List<Option> brandOptions, List<Option> typeOptions) {
 	}
 
 	@Render(template = """

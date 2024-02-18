@@ -23,7 +23,7 @@
  */
 module com.janilla.eshopweb.fullstack {
 
-	requires com.janilla.eshopweb.admin;
+//	requires com.janilla.eshopweb.admin;
 	requires com.janilla.eshopweb.api;
 	requires com.janilla.eshopweb.web;
 }
