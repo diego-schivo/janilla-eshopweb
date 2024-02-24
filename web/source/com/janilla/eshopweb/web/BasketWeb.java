@@ -45,7 +45,7 @@ public class BasketWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/basket")
+	@Handle(method = "GET", path = "/basket")
 	public BasketPage getBasket(HttpExchange exchange) throws IOException {
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
 		var c1 = persistence.getCrud(BasketItem.class);
@@ -59,7 +59,7 @@ public class BasketWeb {
 		return new BasketPage(i);
 	}
 
-	@Handle(method = "POST", uri = "/basket")
+	@Handle(method = "POST", path = "/basket")
 	public URI addItem(@Parameter(name = "id") Long id, HttpExchange exchange) throws IOException {
 		var i = persistence.getCrud(CatalogItem.class).read(id);
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
@@ -74,7 +74,7 @@ public class BasketWeb {
 		return URI.create("/basket");
 	}
 
-	@Handle(method = "POST", uri = "/basket/update")
+	@Handle(method = "POST", path = "/basket/update")
 	public URI update(BasketPage view) throws IOException {
 		var c = persistence.getCrud(BasketItem.class);
 		persistence.getDatabase().perform((ss, ii) -> {

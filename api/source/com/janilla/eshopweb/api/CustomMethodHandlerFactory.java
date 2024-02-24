@@ -24,26 +24,30 @@
 package com.janilla.eshopweb.api;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Properties;
 
-import com.janilla.eshopweb.core.CatalogType;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.HandleException;
+import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.MethodInvocation;
 
-public class CatalogTypeApi {
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
-	Persistence persistence;
+	Properties configuration;
 
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
 	}
 
-	@Handle(method = "GET", path = "/api/catalog-types")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
-		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogType.class);
-		var i = c.list();
-		var r = c.read(i).toList();
-		return Map.of("catalogTypes", r);
+	@Override
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
+		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.disable-unsafe-actions")))
+			switch (exchange.getRequest().getMethod().name()) {
+			case "GET", "OPTIONS":
+				break;
+			default:
+				throw new HandleException(new MethodBlockedException());
+			}
+		super.handle(invocation, exchange);
 	}
 }

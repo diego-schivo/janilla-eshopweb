@@ -35,7 +35,7 @@ import com.janilla.persistence.Persistence;
 import com.janilla.web.ForbiddenException;
 import com.janilla.web.UnauthenticatedException;
 
-class CustomHttpExchange extends HttpExchange {
+abstract class CustomHttpExchange extends HttpExchange {
 
 	Properties configuration;
 

@@ -21,29 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.api;
+module com.janilla.eshopweb.full {
 
-import java.io.IOException;
-import java.util.Map;
-
-import com.janilla.eshopweb.core.CatalogType;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
-
-public class CatalogTypeApi {
-
-	Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
-
-	@Handle(method = "GET", path = "/api/catalog-types")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
-		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogType.class);
-		var i = c.list();
-		var r = c.read(i).toList();
-		return Map.of("catalogTypes", r);
-	}
+	requires com.janilla.eshopweb.api;
+	requires com.janilla.eshopweb.web;
 }

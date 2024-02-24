@@ -25,13 +25,16 @@ class Edit {
 
 	selector;
 
-	rendering;
+	engine;
+
+	itemId;
 
 	data;
 
 	validationMessages;
-	
+
 	set item(x) {
+		this.itemId = x.id;
 		this.data = new FormData();
 		Object.entries(x).forEach(([k, v]) => this.data.append(k, v?.toString()));
 	}
@@ -41,14 +44,18 @@ class Edit {
 	}
 
 	get catalog() {
-		return this.rendering.stack[1].object;
+		return this.engine.stack[1].target;
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	get layout() {
+		return this.engine.stack[0].target;
+	}
+
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				this.rendering = rendering.clone();
-				return await rendering.render(this, 'Edit');
+				this.engine = engine.clone();
+				return await engine.render(this, 'Edit');
 
 			case 'catalogBrandOptions':
 				return this.catalog.catalogBrands?.map(x => ({
@@ -65,19 +72,19 @@ class Edit {
 				}));
 
 			case 'selectedAttribute':
-				return rendering.object.selected ? 'selected' : '';
+				return engine.target.selected ? 'selected' : '';
 		}
 
-		switch (rendering.stack.at(-2)?.key) {
+		switch (engine.stack.at(-2)?.key) {
 			case 'catalogBrandOptions':
 			case 'catalogTypeOptions':
-				return await rendering.render(rendering.object[key], 'Create-option');
+				return await engine.render(engine.target[engine.key], 'Create-option');
 			case 'validationClasses':
-				return this.validationMessages?.hasOwnProperty(key) ? 'invalid' : 'valid';
+				return this.validationMessages?.hasOwnProperty(engine.key) ? 'invalid' : 'valid';
 			case 'validationAttributes':
-				return this.validationMessages?.hasOwnProperty(key) ? 'aria-invalid="true"' : null;
+				return this.validationMessages?.hasOwnProperty(engine.key) ? 'aria-invalid="true"' : null;
 			case 'validationMessages':
-				return this.validationMessages?.hasOwnProperty(key) ? await rendering.render(rendering.object[key], 'Create-validationMessage') : null;
+				return this.validationMessages?.hasOwnProperty(engine.key) ? await engine.render(engine.target[engine.key], 'Create-validationMessage') : null;
 		}
 	}
 
@@ -88,7 +95,7 @@ class Edit {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.rendering.render(this, 'Edit');
+		this.selector().outerHTML = await this.engine.render(this, 'Edit');
 		this.listen();
 	}
 
@@ -128,7 +135,7 @@ class Edit {
 			await this.refresh();
 			return;
 		}
-		o = {};
+		o = { id: this.itemId };
 		this.data.forEach((v, k) => {
 			switch (k) {
 				case 'catalogType':
@@ -143,19 +150,21 @@ class Edit {
 					break;
 			}
 		});
-		const s = await fetch('/api/catalog-items', {
+		const s = await fetch(`${this.layout.api.url}/catalog-items`, {
 			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { ...this.layout.api.headers, 'Content-Type': 'application/json' },
 			body: JSON.stringify(o)
 		});
+		const j = await s.json();
 		if (s.ok) {
 			delete this.data;
 			await this.refresh();
 			this.selector().dispatchEvent(new CustomEvent('editclose', {
 				bubbles: true,
-				detail: { catalogItem: (await s.json()).catalogItem }
+				detail: { catalogItem: j.catalogItem }
 			}));
-		}
+		} else if (typeof j === 'string')
+			alert(j);
 	}
 }
 

@@ -25,7 +25,7 @@ class NavMenu {
 
 	selector;
 
-	rendering;
+	engine;
 
 	get items() {
 		const i = [
@@ -54,18 +54,18 @@ class NavMenu {
 	}
 
 	get layout() {
-		return this.rendering.stack[0].object;
+		return this.engine.stack[0].target;
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				this.rendering = rendering.clone();
-				return await rendering.render(this, 'NavMenu');
+				this.engine = engine.clone();
+				return await engine.render(this, 'NavMenu');
 		}
 
-		if (rendering.stack.at(-2).key === 'items')
-			return await rendering.render(rendering.object[key], 'NavMenu-Item');
+		if (engine.stack.at(-2).key === 'items')
+			return await engine.render(engine.target[engine.key], 'NavMenu-Item');
 	}
 
 	listen = () => {

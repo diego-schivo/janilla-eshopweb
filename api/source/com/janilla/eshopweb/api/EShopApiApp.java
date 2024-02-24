@@ -29,6 +29,9 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
+import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
@@ -37,18 +40,18 @@ import com.janilla.web.AnnotationDrivenToMethodInvocation;
 public class EShopApiApp {
 
 	public static void main(String[] args) throws IOException {
-		var p = new Properties();
-		try (var s = EShopApiApp.class.getResourceAsStream("configuration.properties")) {
-			p.load(s);
-		}
-
 		var a = new EShopApiApp();
-		a.setConfiguration(p);
+		{
+			var c = new Properties();
+			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
+				c.load(s);
+			}
+			a.setConfiguration(c);
+		}
 		a.getPersistence();
 
-		var s = new CustomHttpServer();
-		s.setApp(a);
-		s.setPort(Integer.parseInt(p.getProperty("eshopweb.api.http.port")));
+		var s = a.new Server();
+		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.api.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
@@ -61,7 +64,7 @@ public class EShopApiApp {
 		return b.build();
 	});
 
-	Supplier<IO.Consumer<com.janilla.http.HttpExchange>> handler = Lazy.of(() -> {
+	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
 		var b = new CustomApplicationHandlerBuilder();
 		b.setApplication(this);
 		return b.build();
@@ -85,7 +88,7 @@ public class EShopApiApp {
 		}
 	}
 
-	public IO.Consumer<com.janilla.http.HttpExchange> getHandler() {
+	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
 	}
 
@@ -93,7 +96,15 @@ public class EShopApiApp {
 		return toInvocation;
 	}
 
-	public class HttpExchange extends CustomHttpExchange {
+	class Server extends HttpServer {
+
+		@Override
+		protected HttpExchange newExchange(HttpRequest request) {
+			return new Exchange();
+		}
+	}
+
+	public class Exchange extends CustomHttpExchange {
 		{
 			configuration = getConfiguration();
 			persistence = getPersistence();

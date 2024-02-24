@@ -35,18 +35,20 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	@Override
 	protected void render(ObjectAndType input, HttpExchange exchange) throws IOException {
 		var o = input.object();
-		if (o instanceof Page p) {
-			var e = (CustomHttpExchange) exchange;
-			var b = e.getBasket(false);
-			var q = 0;
-			if (b != null) {
-				var c = e.persistence.getCrud(BasketItem.class);
-				var i = c.filter("basket", b.getId());
-				q = c.read(i).mapToInt(BasketItem::getQuantity).sum();
-			}
-			var l = new Layout(e.getUser(false), q, p);
-			input = new ObjectAndType(l, null);
-		}
+		if (o instanceof Page p)
+			input = new ObjectAndType(toLayout(p, exchange), null);
 		super.render(input, exchange);
+	}
+
+	static Layout toLayout(Page p, HttpExchange exchange) throws IOException {
+		var e = (CustomHttpExchange) exchange;
+		var b = e.getBasket(false);
+		var q = 0;
+		if (b != null) {
+			var c = e.persistence.getCrud(BasketItem.class);
+			var i = c.filter("basket", b.getId());
+			q = c.read(i).mapToInt(BasketItem::getQuantity).sum();
+		}
+		return new Layout(e.getUser(false), q, p);
 	}
 }

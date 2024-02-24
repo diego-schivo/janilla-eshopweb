@@ -23,17 +23,35 @@
  */
 package com.janilla.eshopweb.admin;
 
+import java.util.Properties;
+
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 public class AdminWeb {
 
-	@Handle(method = "GET", uri = "/admin")
+	Properties configuration;
+
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
+	}
+
+	@Handle(method = "GET", path = "/admin")
 	public Admin getAdmin() {
 		return new Admin();
 	}
 
+	@Handle(method = "GET", path = "/admin.js")
+	public Script getScript() {
+		var u = configuration.getProperty("eshopweb.admin.api.url");
+		return new Script(u);
+	}
+
 	@Render(template = "Admin.html")
 	public record Admin() {
+	}
+
+	@Render(template = "admin.js")
+	public record Script(String apiUrl) {
 	}
 }

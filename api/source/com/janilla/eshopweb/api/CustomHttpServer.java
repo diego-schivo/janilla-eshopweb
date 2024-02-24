@@ -21,22 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.api;
-
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpRequest;
-import com.janilla.http.HttpServer;
-
-class CustomHttpServer extends HttpServer {
-
-	EShopApiApp app;
-
-	public void setApp(EShopApiApp app) {
-		this.app = app;
-	}
-
-	@Override
-	protected HttpExchange newExchange(HttpRequest request) {
-		return app.new HttpExchange();
-	}
-}
+//package com.janilla.eshopweb.api;
+//
+//import com.janilla.http.HttpExchange;
+//import com.janilla.http.HttpRequest;
+//import com.janilla.http.HttpServer;
+//
+//class CustomHttpServer extends HttpServer {
+//
+//	EShopApiApp app;
+//
+//	public void setApp(EShopApiApp app) {
+//		this.app = app;
+//	}
+//
+//	@Override
+//	protected HttpExchange newExchange(HttpRequest request) {
+//		return app.new HttpExchange();
+//	}
+//}

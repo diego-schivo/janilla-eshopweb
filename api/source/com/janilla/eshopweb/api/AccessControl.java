@@ -54,7 +54,7 @@ public class AccessControl {
 		this.toInvocation = toInvocation;
 	}
 
-	@Handle(method = "OPTIONS", uri = "/api/(.*)")
+	@Handle(method = "OPTIONS", path = "/api/(.*)")
 	public void allow(HttpRequest request, HttpResponse response) {
 		var o = configuration.getProperty("eshopweb.api.cors.origin");
 		var s = toInvocation.getValueAndGroupsStream(request).flatMap(w -> w.value().methods().stream())

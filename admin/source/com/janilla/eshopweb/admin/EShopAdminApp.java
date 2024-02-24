@@ -47,7 +47,7 @@ public class EShopAdminApp {
 
 		var s = new HttpServer();
 //		s.eShopOnWeb = a;
-		s.setPort(Integer.parseInt(p.getProperty("eshopweb.admin.http.port")));
+		s.setPort(Integer.parseInt(p.getProperty("eshopweb.admin.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
@@ -56,7 +56,7 @@ public class EShopAdminApp {
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
 		var b = new ApplicationHandlerBuilder();
-		b.setApplication(EShopAdminApp.this);
+		b.setApplication(this);
 		return b.build();
 	});
 

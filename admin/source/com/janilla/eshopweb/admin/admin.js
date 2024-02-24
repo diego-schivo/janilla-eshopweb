@@ -21,10 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import MainLayout from './MainLayout.js';
+import Layout from './Layout.js';
 
 const l = () => {
-	const a = new MainLayout();
+	const a = new Layout();
+	a.api = {
+		url: `${apiUrl}`
+	};
 	a.selector = () => document.querySelector('#admin');
 	a.run();
 }

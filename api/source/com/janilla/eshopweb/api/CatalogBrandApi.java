@@ -38,8 +38,8 @@ public class CatalogBrandApi {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/api/catalog-brands")
-	public Object list(EShopApiApp.HttpExchange exchange) throws IOException {
+	@Handle(method = "GET", path = "/api/catalog-brands")
+	public Object list(EShopApiApp.Exchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		var c = persistence.getCrud(CatalogBrand.class);
 		var i = c.list();

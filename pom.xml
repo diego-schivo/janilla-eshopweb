@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>com.janilla</groupId>
 			<artifactId>janilla</artifactId>
-			<version>0.0.11</version>
+			<version>0.0.12-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -41,7 +41,7 @@
 		<module>admin</module>
 		<module>api</module>
 		<module>core</module>
-		<module>fullstack</module>
+		<module>full</module>
 		<module>web</module>
 	</modules>
 	<properties>

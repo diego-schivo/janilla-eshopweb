@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
+import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
@@ -50,7 +51,7 @@ public class EShopWebApp {
 		a.getPersistence();
 
 		var s = new HttpServer();
-		s.setPort(Integer.parseInt(p.getProperty("eshopweb.web.http.port")));
+		s.setPort(Integer.parseInt(p.getProperty("eshopweb.web.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
@@ -69,11 +70,11 @@ public class EShopWebApp {
 		return a;
 	});
 
-	static ThreadLocal<IO.Consumer<com.janilla.http.HttpExchange>> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<IO.Consumer<HttpExchange>> currentHandler = new ThreadLocal<>();
 
-	Supplier<IO.Consumer<com.janilla.http.HttpExchange>> handler = Lazy.of(() -> {
+	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
 		var b = new CustomApplicationHandlerBuilder();
-		b.setApplication(EShopWebApp.this);
+		b.setApplication(this);
 		var hh = List.of(getAdmin().getHandler(), b.build());
 		return e -> {
 			try {
@@ -89,7 +90,7 @@ public class EShopWebApp {
 				h = hh.get(0);
 			for (;;) {
 				if (h == hh.get(1)) {
-					var f = new HttpExchange();
+					var f = new Exchange();
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
 					f.setException(e.getException());
@@ -103,7 +104,7 @@ public class EShopWebApp {
 				} catch (NotFoundException f) {
 					var i = n ? hh.indexOf(h) + 1 : -1;
 					if (i < 0 || i >= hh.size())
-						break;
+						throw new NotFoundException();
 					h = hh.get(i);
 				}
 			}
@@ -130,11 +131,11 @@ public class EShopWebApp {
 		return admin.get();
 	}
 
-	public IO.Consumer<com.janilla.http.HttpExchange> getHandler() {
+	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
 	}
 
-	public class HttpExchange extends CustomHttpExchange {
+	public class Exchange extends CustomHttpExchange {
 		{
 			configuration = getConfiguration();
 			persistence = getPersistence();

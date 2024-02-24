@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.fullstack;
+package com.janilla.eshopweb.full;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,27 +40,27 @@ import com.janilla.web.NotFoundException;
 public class EShopFullApp {
 
 	public static void main(String[] args) throws IOException {
-		var c = new Properties();
-		try (var s = EShopFullApp.class.getResourceAsStream("configuration.properties")) {
-			c.load(s);
+		var a = new EShopFullApp();
+		{
+			var c = new Properties();
+			try (var s = EShopFullApp.class.getResourceAsStream("configuration.properties")) {
+				c.load(s);
+			}
+			a.setConfiguration(c);
 		}
 
-		var f = new EShopFullApp();
-		f.setConfiguration(c);
-
 		var s = new HttpServer();
-		s.setExecutor(Runnable::run);
-		s.setPort(Integer.parseInt(c.getProperty("eshopweb.fullstack.http.port")));
-		s.setHandler(f.getHandler());
+		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port")));
+		s.setHandler(a.getHandler());
 		s.run();
 	}
 
 	Properties configuration;
 
-	Supplier<EShopWebApp> web = Lazy.of(() -> {
-		var w = new EShopWebApp();
-		w.setConfiguration(configuration);
-		return w;
+	Supplier<EShopApiApp> api = Lazy.of(() -> {
+		var a = new EShopApiApp();
+		a.setConfiguration(configuration);
+		return a;
 	});
 
 	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
@@ -69,8 +69,8 @@ public class EShopFullApp {
 		return a;
 	});
 
-	Supplier<EShopApiApp> api = Lazy.of(() -> {
-		var a = new EShopApiApp();
+	Supplier<EShopWebApp> web = Lazy.of(() -> {
+		var a = new EShopWebApp();
 		a.setConfiguration(configuration);
 		return a;
 	});
@@ -92,23 +92,26 @@ public class EShopFullApp {
 			if (n)
 				h = hh.get(0);
 			for (;;) {
-				if (h == hh.get(1)) {
-					var f = getWeb().new HttpExchange();
+				var f = e;
+				if (h == hh.get(1))
+					f = getWeb().new Exchange();
+				if (h == hh.get(2))
+					f = getApi().new Exchange();
+				if (f != e) {
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
 					f.setException(e.getException());
-					e = f;
 				}
 				currentHandler.set(h);
 				try {
-					h.accept(e);
+					h.accept(f);
 					currentHandler.remove();
 					break;
-				} catch (NotFoundException f) {
+				} catch (NotFoundException g) {
 					var i = n ? hh.indexOf(h) + 1 : -1;
-					h = i >= 0 && i < hh.size() ? hh.get(i) : null;
-					if (h == null)
-						break;
+					if (i < 0 || i >= hh.size())
+						throw new NotFoundException();
+					h = hh.get(i);
 				}
 			}
 		};
@@ -122,16 +125,16 @@ public class EShopFullApp {
 		this.configuration = configuration;
 	}
 
-	public EShopWebApp getWeb() {
-		return web.get();
+	public EShopApiApp getApi() {
+		return api.get();
 	}
 
 	public EShopAdminApp getAdmin() {
 		return admin.get();
 	}
 
-	public EShopApiApp getApi() {
-		return api.get();
+	public EShopWebApp getWeb() {
+		return web.get();
 	}
 
 	public IO.Consumer<HttpExchange> getHandler() {

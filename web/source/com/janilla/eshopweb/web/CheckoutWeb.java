@@ -52,7 +52,7 @@ public class CheckoutWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/basket/checkout")
+	@Handle(method = "GET", path = "/basket/checkout")
 	public Checkout getCheckout(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		e.getUser(true);
@@ -68,7 +68,7 @@ public class CheckoutWeb {
 		return new Checkout(i);
 	}
 
-	@Handle(method = "POST", uri = "/basket/checkout")
+	@Handle(method = "POST", path = "/basket/checkout")
 	public URI pay(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var b = e.getBasket(false);
@@ -103,7 +103,7 @@ public class CheckoutWeb {
 		return URI.create("/basket/success");
 	}
 
-	@Handle(method = "GET", uri = "/basket/success")
+	@Handle(method = "GET", path = "/basket/success")
 	public Success getSuccess() {
 		return new Success();
 	}

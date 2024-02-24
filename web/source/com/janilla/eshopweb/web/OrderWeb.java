@@ -44,7 +44,7 @@ public class OrderWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/order/history")
+	@Handle(method = "GET", path = "/order/history")
 	public History getHistory(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -62,7 +62,7 @@ public class OrderWeb {
 		return new History(i);
 	}
 
-	@Handle(method = "GET", uri = "/order/detail/(\\d+)")
+	@Handle(method = "GET", path = "/order/detail/(\\d+)")
 	public Detail getDetail(long id, HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);

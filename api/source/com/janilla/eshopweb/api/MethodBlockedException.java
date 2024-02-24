@@ -23,27 +23,14 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.io.IOException;
-import java.util.Map;
+import com.janilla.web.Error;
 
-import com.janilla.eshopweb.core.CatalogType;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
+@Error(code = 403, text = "Forbidden")
+public class MethodBlockedException extends RuntimeException {
 
-public class CatalogTypeApi {
+	private static final long serialVersionUID = -1701687577964006939L;
 
-	Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
-
-	@Handle(method = "GET", path = "/api/catalog-types")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
-		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogType.class);
-		var i = c.list();
-		var r = c.read(i).toList();
-		return Map.of("catalogTypes", r);
+	public MethodBlockedException() {
+		super("The requested action is disabled on this public server: please set up and run the application locally");
 	}
 }

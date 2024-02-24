@@ -21,29 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.api;
+package com.janilla.eshopweb.web;
 
-import java.io.IOException;
-import java.util.Map;
+import com.janilla.web.Render;
 
-import com.janilla.eshopweb.core.CatalogType;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
+@Render(template = "error.html")
+public class MethodBlockedException extends RuntimeException implements Page {
 
-public class CatalogTypeApi {
+	private static final long serialVersionUID = 6649890448711337386L;
 
-	Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
+	public MethodBlockedException() {
+		super("The requested action is disabled on this public server: please set up and run the application locally");
 	}
 
-	@Handle(method = "GET", path = "/api/catalog-types")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
-		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogType.class);
-		var i = c.list();
-		var r = c.read(i).toList();
-		return Map.of("catalogTypes", r);
+	@Override
+	public String title() {
+		return "Action disabled";
 	}
 }

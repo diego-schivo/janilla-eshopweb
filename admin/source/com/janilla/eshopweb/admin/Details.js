@@ -25,7 +25,7 @@ class Details {
 
 	selector;
 
-	rendering;
+	engine;
 
 	item;
 
@@ -33,11 +33,11 @@ class Details {
 		return this.item ? 'block' : 'none';
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				this.rendering = rendering.clone();
-				return await rendering.render(this, 'Details');
+				this.engine = engine.clone();
+				return await engine.render(this, 'Details');
 		}
 	}
 
@@ -48,7 +48,7 @@ class Details {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.rendering.render(this, 'Details');
+		this.selector().outerHTML = await this.engine.render(this, 'Details');
 		this.listen();
 	}
 

@@ -64,8 +64,8 @@ public class UserWeb {
 //
 //	static URI ROLE_CLAIM_TYPE = URI.create("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
 
-	@Handle(method = "GET", uri = "/user")
-	public Object getUser(EShopWebApp.HttpExchange exchange) {
+	@Handle(method = "GET", path = "/user")
+	public Object getUser(EShopWebApp.Exchange exchange) {
 		var u = exchange.getUser(false);
 //		System.out.println("user=" + u);
 		var t = getJwt(u.getEmail());
@@ -83,16 +83,16 @@ public class UserWeb {
 		return Jwt.generateToken(h, p, configuration.getProperty("eshopweb.jwt.key"));
 	}
 
-	@Handle(method = "GET", uri = "/user/login")
+	@Handle(method = "GET", path = "/user/login")
 	public Login getLogin() {
 		return new Login(null, null);
 	}
 
 	static Pattern emailPattern = Pattern.compile("\\S+@\\S+\\.\\S+");
 
-	@Handle(method = "POST", uri = "/user/login")
+	@Handle(method = "POST", path = "/user/login")
 	public Object authenticate(Login.Form form, @Parameter(name = "returnUrl") URI returnURI,
-			EShopWebApp.HttpExchange exchange) throws IOException {
+			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");
@@ -138,14 +138,14 @@ public class UserWeb {
 		return returnURI != null ? returnURI : URI.create("/");
 	}
 
-	@Handle(method = "GET", uri = "/user/login/two-factor")
+	@Handle(method = "GET", path = "/user/login/two-factor")
 	public TwoFactor getTwoFactor() {
 		return new TwoFactor(null, null);
 	}
 
-	@Handle(method = "POST", uri = "/user/login/two-factor")
+	@Handle(method = "POST", path = "/user/login/two-factor")
 	public Object authenticate(TwoFactor.Form form, @Parameter(name = "returnUrl") URI returnURI,
-			EShopWebApp.HttpExchange exchange) throws IOException {
+			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
 			v.set("code", "The Code field is required.");
@@ -178,14 +178,14 @@ public class UserWeb {
 		return returnURI != null ? returnURI : URI.create("/");
 	}
 
-	@Handle(method = "GET", uri = "/user/login/recovery")
+	@Handle(method = "GET", path = "/user/login/recovery")
 	public Recovery getRecovery() {
 		return new Recovery(null, null);
 	}
 
-	@Handle(method = "POST", uri = "/user/login/recovery")
+	@Handle(method = "POST", path = "/user/login/recovery")
 	public Object authenticate(Recovery.Form form, @Parameter(name = "returnUrl") URI returnURI,
-			EShopWebApp.HttpExchange exchange) throws IOException {
+			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
 			v.set("code", "The Code field is required.");
@@ -220,19 +220,19 @@ public class UserWeb {
 		return returnURI != null ? returnURI : URI.create("/");
 	}
 
-	@Handle(method = "POST", uri = "/user/logout")
-	public URI logout(EShopWebApp.HttpExchange exchange) {
+	@Handle(method = "POST", path = "/user/logout")
+	public URI logout(EShopWebApp.Exchange exchange) {
 		exchange.removeUserCookie();
 		return URI.create("/");
 	}
 
-	@Handle(method = "GET", uri = "/user/reset-password")
+	@Handle(method = "GET", path = "/user/reset-password")
 	public ResetPassword getResetPassword() {
 		return new ResetPassword(null, null);
 	}
 
-	@Handle(method = "POST", uri = "/user/reset-password")
-	public Object resetPassword(ResetPassword.Form form, EShopWebApp.HttpExchange exchange) throws IOException {
+	@Handle(method = "POST", path = "/user/reset-password")
+	public Object resetPassword(ResetPassword.Form form, EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");
@@ -243,12 +243,12 @@ public class UserWeb {
 		return URI.create("/user/reset-password-confirmation");
 	}
 
-	@Handle(method = "GET", uri = "/user/reset-password-confirmation")
+	@Handle(method = "GET", path = "/user/reset-password-confirmation")
 	public ResetPassword.Confirmation getResetPasswordConfirmation() {
 		return new ResetPassword.Confirmation();
 	}
 
-	@Handle(method = "GET", uri = "/user/register")
+	@Handle(method = "GET", path = "/user/register")
 	public Register getRegister() {
 		return new Register(null, null);
 	}
@@ -259,8 +259,8 @@ public class UserWeb {
 
 	static Pattern uppercasePattern = Pattern.compile("[A-Z]");
 
-	@Handle(method = "POST", uri = "/user/register")
-	public Object createAccount(Register.Form form, EShopWebApp.HttpExchange exchange) throws IOException {
+	@Handle(method = "POST", path = "/user/register")
+	public Object createAccount(Register.Form form, EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");

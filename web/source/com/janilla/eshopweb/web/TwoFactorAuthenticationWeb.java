@@ -60,13 +60,13 @@ public class TwoFactorAuthenticationWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator")
+	@Handle(method = "GET", path = "/account/authenticator")
 	public Account getAuthenticator(HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 		return new Account(new Authenticator(u));
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator/enable")
+	@Handle(method = "GET", path = "/account/authenticator/enable")
 	public Account getEnable(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -78,7 +78,7 @@ public class TwoFactorAuthenticationWeb {
 		return new Account(new Enable(f, q));
 	}
 
-	@Handle(method = "POST", uri = "/account/authenticator/enable")
+	@Handle(method = "POST", path = "/account/authenticator/enable")
 	public Object enable(Enable.Form form, HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -97,7 +97,7 @@ public class TwoFactorAuthenticationWeb {
 		return URI.create("/account/authenticator/recovery");
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator/disable")
+	@Handle(method = "GET", path = "/account/authenticator/disable")
 	public Account getDisable(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -106,7 +106,7 @@ public class TwoFactorAuthenticationWeb {
 		return new Account(new Disable());
 	}
 
-	@Handle(method = "POST", uri = "/account/authenticator/disable")
+	@Handle(method = "POST", path = "/account/authenticator/disable")
 	public Object disable(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -117,7 +117,7 @@ public class TwoFactorAuthenticationWeb {
 		return URI.create("/account/authenticator");
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator/recovery")
+	@Handle(method = "GET", path = "/account/authenticator/recovery")
 	public Account getRecovery(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -127,7 +127,7 @@ public class TwoFactorAuthenticationWeb {
 		return new Account(new Recovery(c));
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator/reset")
+	@Handle(method = "GET", path = "/account/authenticator/reset")
 	public Account getReset(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -136,7 +136,7 @@ public class TwoFactorAuthenticationWeb {
 		return new Account(new Reset());
 	}
 
-	@Handle(method = "POST", uri = "/account/authenticator/reset")
+	@Handle(method = "POST", path = "/account/authenticator/reset")
 	public Object reset(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -147,7 +147,7 @@ public class TwoFactorAuthenticationWeb {
 		return URI.create("/account/authenticator/enable");
 	}
 
-	@Handle(method = "GET", uri = "/account/authenticator/recovery/reset")
+	@Handle(method = "GET", path = "/account/authenticator/recovery/reset")
 	public Account getRecoveryReset(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);
@@ -156,7 +156,7 @@ public class TwoFactorAuthenticationWeb {
 		return new Account(new RecoveryReset());
 	}
 
-	@Handle(method = "POST", uri = "/account/authenticator/recovery/reset")
+	@Handle(method = "POST", path = "/account/authenticator/recovery/reset")
 	public Object resetRecovery(HttpExchange exchange) throws IOException {
 		var e = (CustomHttpExchange) exchange;
 		var u = e.getUser(true);

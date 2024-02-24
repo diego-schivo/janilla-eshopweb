@@ -41,7 +41,7 @@ import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.UnauthenticatedException;
 
-class CustomHttpExchange extends HttpExchange {
+abstract class CustomHttpExchange extends HttpExchange {
 
 	Properties configuration;
 
@@ -112,7 +112,7 @@ class CustomHttpExchange extends HttpExchange {
 		}
 	}
 
-	static String BASKET_COOKIE = "eShop";
+	static String BASKET_COOKIE = "basket";
 
 	public void addBasketCookie(String value) {
 		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, value,
@@ -129,7 +129,7 @@ class CustomHttpExchange extends HttpExchange {
 				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict"));
 	}
 
-	static String USER_COOKIE = "EshopIdentifier";
+	static String USER_COOKIE = "user";
 
 	public void addUserCookie(String value) {
 		getResponse().getHeaders().add("Set-Cookie",

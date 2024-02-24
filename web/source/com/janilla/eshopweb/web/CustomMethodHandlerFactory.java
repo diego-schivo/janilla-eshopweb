@@ -21,9 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module com.janilla.eshopweb.fullstack {
+package com.janilla.eshopweb.web;
 
-//	requires com.janilla.eshopweb.admin;
-	requires com.janilla.eshopweb.api;
-	requires com.janilla.eshopweb.web;
+import java.io.IOException;
+import java.util.Properties;
+
+import com.janilla.http.HttpExchange;
+import com.janilla.web.HandleException;
+import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.MethodInvocation;
+
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
+
+	Properties configuration;
+
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
+	}
+
+	@Override
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
+		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.disable-unsafe-actions"))) {
+			var q = exchange.getRequest();
+			switch (q.getMethod().name()) {
+			case "GET":
+				break;
+			default:
+				if (!q.getURI().getPath().equals("/user/logout"))
+					throw new HandleException(new MethodBlockedException());
+			}
+		}
+		super.handle(invocation, exchange);
+	}
 }

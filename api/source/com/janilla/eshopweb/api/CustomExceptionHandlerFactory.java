@@ -24,26 +24,26 @@
 package com.janilla.eshopweb.api;
 
 import java.io.IOException;
-import java.util.Map;
 
-import com.janilla.eshopweb.core.CatalogType;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
+import com.janilla.frontend.RenderEngine.ObjectAndType;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.Error;
+import com.janilla.web.ExceptionHandlerFactory;
+import com.janilla.web.HandlerFactory;
 
-public class CatalogTypeApi {
+public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	Persistence persistence;
+	protected HandlerFactory mainFactory;
 
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
+	public void setMainFactory(HandlerFactory mainFactory) {
+		this.mainFactory = mainFactory;
 	}
 
-	@Handle(method = "GET", path = "/api/catalog-types")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
-		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogType.class);
-		var i = c.list();
-		var r = c.read(i).toList();
-		return Map.of("catalogTypes", r);
+	@Override
+	protected void handle(Error error, HttpExchange context) throws IOException {
+		super.handle(error, context);
+		var e = context.getException();
+		if (e instanceof Exception)
+			mainFactory.createHandler(new ObjectAndType(e.getMessage(), null), context).accept(context);
 	}
 }

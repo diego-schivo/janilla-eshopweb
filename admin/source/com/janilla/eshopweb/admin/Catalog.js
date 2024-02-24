@@ -31,7 +31,7 @@ class Catalog {
 
 	selector;
 
-	rendering;
+	engine;
 
 	catalogItems;
 
@@ -48,20 +48,20 @@ class Catalog {
 	delete;
 
 	get layout() {
-		return this.rendering.stack[0].object;
+		return this.engine.stack[0].target;
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				this.rendering = rendering.clone();
-				return await rendering.render(this, 'Catalog');
+				this.engine = engine.clone();
+				return await engine.render(this, 'Catalog');
 
 			case 'catalogType':
-				return this.catalogTypes.find(x => x.id === rendering.object.catalogType)?.name;
+				return this.catalogTypes.find(x => x.id === engine.target.catalogType)?.name;
 
 			case 'catalogBrand':
-				return this.catalogBrands.find(x => x.id === rendering.object.catalogBrand)?.name;
+				return this.catalogBrands.find(x => x.id === engine.target.catalogBrand)?.name;
 
 			case 'details':
 				this.details = new Details();
@@ -97,7 +97,7 @@ class Catalog {
 		e.addEventListener('deleteclose', this.handleDeleteClose);
 		if (!this.catalogItems)
 			this.fetchItems().then(c => {
-				return this.rendering.render(this, 'Catalog2');
+				return this.engine.render(this, 'Catalog2');
 			}).then(h => {
 				this.selector().outerHTML = h;
 				this.listen();
@@ -117,7 +117,7 @@ class Catalog {
 		delete this.edit;
 		delete this.create;
 		delete this.delete;
-		this.selector().outerHTML = await this.rendering.render(this, 'Catalog');
+		this.selector().outerHTML = await this.engine.render(this, 'Catalog');
 		this.listen();
 	}
 

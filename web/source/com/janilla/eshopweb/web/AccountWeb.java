@@ -49,7 +49,7 @@ public class AccountWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/account/profile")
+	@Handle(method = "GET", path = "/account/profile")
 	public Account getProfile(HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 		var m = Profile.statusMessages.remove(u.getId());
@@ -58,7 +58,7 @@ public class AccountWeb {
 
 	static Pattern phonePattern = Pattern.compile("\\+?[0-9 \\.\\-\\(\\)]+");
 
-	@Handle(method = "POST", uri = "/account/profile")
+	@Handle(method = "POST", path = "/account/profile")
 	public Object updateProfile(ApplicationUser user, HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 
@@ -80,21 +80,21 @@ public class AccountWeb {
 		return URI.create("/account/profile");
 	}
 
-	@Handle(method = "POST", uri = "/account/verification")
+	@Handle(method = "POST", path = "/account/verification")
 	public URI sendVerificationEmail(HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 		Profile.statusMessages.put(u.getId(), "Verification email sent. Please check your email.");
 		return URI.create("/account/profile");
 	}
 
-	@Handle(method = "GET", uri = "/account/password")
+	@Handle(method = "GET", path = "/account/password")
 	public Account getPassword(HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 		var m = Password.statusMessages.remove(u.getId());
 		return new Account(new Password(m, null, null));
 	}
 
-	@Handle(method = "POST", uri = "/account/password")
+	@Handle(method = "POST", path = "/account/password")
 	public Object changePassword(Password.Form form, HttpExchange exchange) throws IOException {
 		var u = ((CustomHttpExchange) exchange).getUser(true);
 

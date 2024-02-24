@@ -23,10 +23,10 @@
  */
 import Catalog from './Catalog.js';
 import NavMenu from './NavMenu.js';
-import Rendering from './Rendering.js';
+import RenderEngine from './RenderEngine.js';
 import Toast from './Toast.js';
 
-class MainLayout {
+class Layout {
 
 	selector;
 
@@ -34,31 +34,24 @@ class MainLayout {
 
 	api;
 
-//	get administrator() {
-//		return this.user?.claims.some(x => x.type === this.user.roleClaimType && x.value === 'Administrators');
-//	}
-
 	run = async () => {
 		const s = await fetch('/user');
 		this.user = s.ok ? await s.json() : null;
 		if (this.user) {
-			this.api = {
-				url: 'http://127.0.0.1:8081/api',
-				headers: {
-					Authorization: `Bearer ${this.user.token}`
-				}
+			this.api.headers = {
+				Authorization: `Bearer ${this.user.token}`
 			};
-			const r = new Rendering();
-			this.selector().innerHTML = await r.render(this, 'MainLayout');
+			const r = new RenderEngine();
+			this.selector().innerHTML = await r.render(this, 'Layout');
 			this.listen();
 		} else
 			location.href = '/user/login?returnUrl=%2fAdmin';
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	render = async engine => {
+		switch (engine.key) {
 			case 'sidebar':
-				return this.user.roles.includes('Administrators') ? await rendering.render(this, 'MainLayout-sidebar') : null;
+				return this.user.roles.includes('Administrators') ? await engine.render(this, 'Layout-sidebar') : null;
 
 			case 'navMenu':
 				this.navMenu = new NavMenu();
@@ -76,7 +69,7 @@ class MainLayout {
 					this.catalog.selector = () => this.selector().querySelector('.content').lastElementChild;
 					return this.catalog;
 				} else
-					return await rendering.render(this, 'MainLayout-unauthorized');
+					return await engine.render(this, 'Layout-unauthorized');
 		}
 	}
 
@@ -87,4 +80,4 @@ class MainLayout {
 	}
 }
 
-export default MainLayout;
+export default Layout;

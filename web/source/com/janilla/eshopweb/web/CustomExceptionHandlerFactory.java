@@ -26,43 +26,51 @@ package com.janilla.eshopweb.web;
 import java.io.IOException;
 import java.net.URI;
 
+import com.janilla.frontend.RenderEngine.ObjectAndType;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpResponse.Status;
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
+import com.janilla.web.HandlerFactory;
 import com.janilla.web.UnauthenticatedException;
 
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
+	protected HandlerFactory mainFactory;
+
+	public void setMainFactory(HandlerFactory mainFactory) {
+		this.mainFactory = mainFactory;
+	}
+
 	@Override
 	protected void handle(Error error, HttpExchange exchange) throws IOException {
 		super.handle(error, exchange);
+
 		var e = exchange.getException();
-		switch (e) {
-		case UnauthenticatedException f: {
-			var q = new EntryList<String, String>();
-			q.add("returnUrl", exchange.getRequest().getURI().toString());
-			var u = URI.create("/user/login?" + Net.formatQueryString(q));
-			var s = exchange.getResponse();
-			s.setStatus(new Status(302, "Found"));
-			s.getHeaders().set("Cache-Control", "no-cache");
-			s.getHeaders().set("Location", u.toString());
+		{
+			var p = switch (e) {
+			case UnauthenticatedException f -> "/user/login";
+			case TwoFactorAuthenticationException f -> "/user/login/two-factor";
+			default -> null;
+			};
+			if (p != null) {
+				var q = new EntryList<String, String>();
+				q.add("returnUrl", exchange.getRequest().getURI().toString());
+				var u = URI.create("/user/login?" + Net.formatQueryString(q));
+				var s = exchange.getResponse();
+				s.setStatus(new Status(302, "Found"));
+				s.getHeaders().set("Cache-Control", "no-cache");
+				s.getHeaders().set("Location", u.toString());
+				return;
+			}
 		}
-			break;
-		case TwoFactorAuthenticationException f: {
-			var q = new EntryList<String, String>();
-			q.add("returnUrl", exchange.getRequest().getURI().toString());
-			var u = URI.create("/user/login/two-factor?" + Net.formatQueryString(q));
-			var s = exchange.getResponse();
-			s.setStatus(new Status(302, "Found"));
-			s.getHeaders().set("Cache-Control", "no-cache");
-			s.getHeaders().set("Location", u.toString());
-		}
-			break;
-		default:
-			break;
+
+		if (e instanceof Page p) {
+			var l = CustomTemplateHandlerFactory.toLayout(p, exchange);
+			var h = mainFactory.createHandler(new ObjectAndType(l, null), exchange);
+			h.accept(exchange);
 		}
 	}
 }

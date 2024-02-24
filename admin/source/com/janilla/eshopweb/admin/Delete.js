@@ -25,7 +25,7 @@ class Delete {
 
 	selector;
 
-	rendering;
+	engine;
 
 	item;
 
@@ -33,11 +33,15 @@ class Delete {
 		return this.item ? 'block' : 'none';
 	}
 
-	render = async (key, rendering) => {
-		switch (key) {
+	get layout() {
+		return this.engine.stack[0].target;
+	}
+
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				this.rendering = rendering.clone();
-				return await rendering.render(this, 'Delete');
+				this.engine = engine.clone();
+				return await engine.render(this, 'Delete');
 		}
 	}
 
@@ -48,7 +52,7 @@ class Delete {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.rendering.render(this, 'Delete');
+		this.selector().outerHTML = await this.engine.render(this, 'Delete');
 		this.listen();
 	}
 
@@ -59,15 +63,20 @@ class Delete {
 	}
 
 	handleDeleteClick = async e => {
-		const s = await fetch(`/api/catalog-items/${this.item.id}`, { method: 'DELETE' });
+		const s = await fetch(`${this.layout.api.url}/catalog-items/${this.item.id}`, {
+			method: 'DELETE',
+			headers: this.layout.api.headers
+		});
+		const j = await s.json();
 		if (s.ok) {
 			delete this.item;
 			await this.refresh();
 			this.selector().dispatchEvent(new CustomEvent('deleteclose', {
 				bubbles: true,
-				detail: { status: (await s.json()).status }
+				detail: { status: j.status }
 			}));
-		}
+		} else if (typeof j === 'string')
+			alert(j);
 	}
 }
 

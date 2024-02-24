@@ -35,8 +35,8 @@ public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
 	@Override
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
 			EntryList<String, String> entries, String body) {
-		if (type == EShopWebApp.HttpExchange.class)
-			return (EShopWebApp.HttpExchange) exchange;
+		if (type == EShopWebApp.Exchange.class)
+			return (EShopWebApp.Exchange) exchange;
 		return super.resolveArgument(type, exchange, values, entries, body);
 	}
 }

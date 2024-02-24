@@ -27,10 +27,10 @@ class CatalogItem {
 	
 	item;
 
-	render = async (key, rendering) => {
-		switch (key) {
+	render = async engine => {
+		switch (engine.key) {
 			case undefined:
-				return await rendering.render(this, 'CatalogItem');
+				return await engine.render(this, 'CatalogItem');
 		}
 	}
 

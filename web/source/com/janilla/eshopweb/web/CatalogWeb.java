@@ -45,7 +45,7 @@ public class CatalogWeb {
 		this.persistence = persistence;
 	}
 
-	@Handle(method = "GET", uri = "/")
+	@Handle(method = "GET", path = "/")
 	public Catalog getCatalog(@Parameter(name = "brand") long brand, @Parameter(name = "type") long type,
 			@Parameter(name = "page") int page) throws IOException {
 		var c1 = persistence.getCrud(CatalogBrand.class);
