@@ -52,33 +52,32 @@ class Edit {
 	}
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				this.engine = engine.clone();
-				return await engine.render(this, 'Edit');
-
-			case 'catalogBrandOptions':
-				return this.catalog.catalogBrands?.map(x => ({
-					value: x.id,
-					text: x.name,
-					selected: x.id == this.data?.get('catalogBrand')
-				}));
-
-			case 'catalogTypeOptions':
-				return this.catalog.catalogTypes?.map(x => ({
-					value: x.id,
-					text: x.name,
-					selected: x.id == this.data?.get('catalogType')
-				}));
-
-			case 'selectedAttribute':
-				return engine.target.selected ? 'selected' : '';
+		if (engine.isRendering(this)) {
+			this.engine = engine.clone();
+			return await engine.render(this, 'Edit');
 		}
 
+		if (engine.isRendering(this, 'catalogBrandOptions'))
+			return this.catalog.catalogBrands?.map(x => ({
+				value: x.id,
+				text: x.name,
+				selected: x.id == this.data?.get('catalogBrand')
+			}));
+
+		if (engine.isRendering(this, 'catalogTypeOptions'))
+			return this.catalog.catalogTypes?.map(x => ({
+				value: x.id,
+				text: x.name,
+				selected: x.id == this.data?.get('catalogType')
+			}));
+
+		if (engine.isRendering(this, 'selectedAttribute'))
+			return engine.target.selected ? 'selected' : '';
+
+		if (engine.isRendering(this, 'catalogBrandOptions', true) || engine.isRendering(this, 'catalogTypeOptions', true))
+			return await engine.render(engine.target, 'Create-option');
+
 		switch (engine.stack.at(-2)?.key) {
-			case 'catalogBrandOptions':
-			case 'catalogTypeOptions':
-				return await engine.render(engine.target[engine.key], 'Create-option');
 			case 'validationClasses':
 				return this.validationMessages?.hasOwnProperty(engine.key) ? 'invalid' : 'valid';
 			case 'validationAttributes':

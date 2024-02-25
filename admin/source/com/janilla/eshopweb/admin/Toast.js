@@ -26,10 +26,8 @@ class Toast {
 	selector;
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				return await engine.render(this, 'Toast');
-		}
+		if (engine.isRendering(this))
+			return await engine.render(this, 'Toast');
 	}
 
 	listen = () => {

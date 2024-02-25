@@ -24,14 +24,12 @@
 class CatalogItem {
 
 	selector;
-	
+
 	item;
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				return await engine.render(this, 'CatalogItem');
-		}
+		if (engine.isRendering(this))
+			return await engine.render(this, 'CatalogItem');
 	}
 
 	listen = () => {
@@ -40,14 +38,14 @@ class CatalogItem {
 		e.querySelector('.btn-primary').addEventListener('click', this.handleEditClick);
 		e.querySelector('.btn-danger').addEventListener('click', this.handleDeleteClick);
 	}
-	
+
 	handleClick = e => {
 		this.selector().dispatchEvent(new CustomEvent('detailsopen', {
 			bubbles: true,
 			detail: { item: this.item }
 		}));
 	}
-	
+
 	handleEditClick = e => {
 		e.stopPropagation();
 		this.selector().dispatchEvent(new CustomEvent('editopen', {
@@ -55,7 +53,7 @@ class CatalogItem {
 			detail: { item: this.item }
 		}));
 	}
-	
+
 	handleDeleteClick = e => {
 		e.stopPropagation();
 		this.selector().dispatchEvent(new CustomEvent('deleteopen', {

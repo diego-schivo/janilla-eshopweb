@@ -8,9 +8,9 @@
 				<section class="esh-orders-detail-title col-xs-3">Status</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-3">${order.id}</section>
-				<section class="esh-orders-detail-item col-xs-3">${order.orderDate}</section>
-				<section class="esh-orders-detail-item col-xs-2">$ ${total}</section>
+				<section class="esh-orders-detail-item col-xs-3">__order.id__</section>
+				<section class="esh-orders-detail-item col-xs-3">__order.orderDate__</section>
+				<section class="esh-orders-detail-item col-xs-2">$ __total__</section>
 				<section class="esh-orders-detail-item col-xs-3">Pending</section>
 			</article>
 		</section>
@@ -19,20 +19,20 @@
 				<section class="esh-orders-detail-title col-xs-12">Shipping Address</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.street}</section>
+				<section class="esh-orders-detail-item col-xs-12">__order.shipToAddress.street__</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.city}</section>
+				<section class="esh-orders-detail-item col-xs-12">__order.shipToAddress.city__</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.country}</section>
+				<section class="esh-orders-detail-item col-xs-12">__order.shipToAddress.country__</section>
 			</article>
 		</section>
 		<section class="esh-orders-detail-section">
 			<article class="esh-orders-detail-titles row">
 				<section class="esh-orders-detail-title col-xs-12">ORDER DETAILS</section>
 			</article>
-			#{items}
+			<!--__items__-->
 		</section>
 		<section class="esh-orders-detail-section esh-orders-detail-section--right">
 			<article class="esh-orders-detail-titles esh-basket-titles--clean row">

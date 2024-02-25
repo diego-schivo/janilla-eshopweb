@@ -58,14 +58,13 @@ class NavMenu {
 	}
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				this.engine = engine.clone();
-				return await engine.render(this, 'NavMenu');
+		if (engine.isRendering(this)) {
+			this.engine = engine.clone();
+			return await engine.render(this, 'NavMenu');
 		}
 
-		if (engine.stack.at(-2).key === 'items')
-			return await engine.render(engine.target[engine.key], 'NavMenu-Item');
+		if (engine.isRendering(this, 'items', true))
+			return await engine.render(engine.target, 'NavMenu-Item');
 	}
 
 	listen = () => {

@@ -38,10 +38,9 @@ class Delete {
 	}
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				this.engine = engine.clone();
-				return await engine.render(this, 'Delete');
+		if (engine.isRendering(this)) {
+			this.engine = engine.clone();
+			return await engine.render(this, 'Delete');
 		}
 	}
 

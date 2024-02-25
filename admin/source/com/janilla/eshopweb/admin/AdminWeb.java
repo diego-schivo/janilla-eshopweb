@@ -38,20 +38,21 @@ public class AdminWeb {
 
 	@Handle(method = "GET", path = "/admin")
 	public Admin getAdmin() {
-		return new Admin();
+		var u = configuration.getProperty("eshopweb.admin.api.url");
+		return new Admin(u);
 	}
 
-	@Handle(method = "GET", path = "/admin.js")
-	public Script getScript() {
-		var u = configuration.getProperty("eshopweb.admin.api.url");
-		return new Script(u);
-	}
+//	@Handle(method = "GET", path = "/admin.js")
+//	public Script getScript() {
+//		var u = configuration.getProperty("eshopweb.admin.api.url");
+//		return new Script(u);
+//	}
 
 	@Render(template = "Admin.html")
-	public record Admin() {
+	public record Admin(String apiUrl) {
 	}
 
-	@Render(template = "admin.js")
-	public record Script(String apiUrl) {
-	}
+//	@Render(template = "admin.js")
+//	public record Script(String apiUrl) {
+//	}
 }

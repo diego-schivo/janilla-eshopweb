@@ -43,10 +43,8 @@ public class EShopAdminApp {
 
 		var a = new EShopAdminApp();
 		a.setConfiguration(p);
-//		a.getPersistence();
 
 		var s = new HttpServer();
-//		s.eShopOnWeb = a;
 		s.setPort(Integer.parseInt(p.getProperty("eshopweb.admin.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();

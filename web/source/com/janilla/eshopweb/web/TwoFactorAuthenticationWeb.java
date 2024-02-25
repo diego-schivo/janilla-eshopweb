@@ -280,7 +280,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 
 		@Render(template = """
-				<code>${value}</code>${delimiter}
+				<code>__value__</code>__delimiter__
 				""")
 		public record Code(int index, String value) {
 

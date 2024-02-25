@@ -1,10 +1,10 @@
 <div>
-	<div class="modal Show" tabindex="-1" role="dialog" style="display: ${display}">
+	<div class="modal Show" tabindex="-1" role="dialog" style="display: __display__">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<form>
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Edit ${data.name}</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Edit __data.name__</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">×</span>
 						</button>
@@ -12,20 +12,20 @@
 					<div class="modal-body">
 						<div class="container">
 							<div class="row">
-								<img class="col-md-6 esh-picture" src="${data.pictureUri}" />
+								<img class="col-md-6 esh-picture" src="__data.pictureUri__" />
 								<div class="col-md-6 ">
 									<div class="form-group">
 										<label class="control-label col-md-6">Name</label>
 										<div class="col-md-12">
-											<input class="form-control ${validationClasses.name}" name="name" value="${data.name}" #{validationAttributes.name} />
-											#{validationMessages.name}
+											<input class="form-control __validationClasses.name__" name="name" value="__data.name__" <!--__validationAttributes.name__--> />
+											<!--__validationMessages.name__-->
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-6">Description</label>
 										<div class="col-md-12">
-											<input class="form-control ${validationClasses.description}" name="description" value="${data.description}" #{validationAttributes.description} />
-											#{validationMessages.description}
+											<input class="form-control __validationClasses.description__" name="description" value="__data.description__" <!--__validationAttributes.description__--> />
+											<!--__validationMessages.description__-->
 										</div>
 									</div>
 								</div>
@@ -33,26 +33,26 @@
 									<div class="form-group">
 										<label class="control-label col-md-6">Brand</label>
 										<div class="col-md-12">
-											<select class="form-control ${validationClasses.catalogBrand}" name="catalogBrand" #{validationAttributes.catalogBrand}>
-												#{catalogBrandOptions}
+											<select class="form-control __validationClasses.catalogBrand__" name="catalogBrand" <!--__validationAttributes.catalogBrand__-->>
+												<!--__catalogBrandOptions__-->
 											</select>
-											#{validationMessages.catalogBrand}
+											<!--__validationMessages.catalogBrand__-->
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-6">Type</label>
 										<div class="col-md-12">
-											<select class="form-control ${validationClasses.catalogType}" name="catalogType" #{validationAttributes.catalogType}>
-												#{catalogTypeOptions}
+											<select class="form-control __validationClasses.catalogType__" name="catalogType" <!--__validationAttributes.catalogType__-->>
+												<!--__catalogTypeOptions__-->
 											</select>
-											#{validationMessages.catalogType}
+											<!--__validationMessages.catalogType__-->
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-6">Price</label>
 										<div class="col-md-12">
-											<input step="any" type="number" class="form-control ${validationClasses.price}" name="price" value="${data.price}" #{validationAttributes.price} />
-											#{validationMessages.price}
+											<input step="any" type="number" class="form-control __validationClasses.price__" name="price" value="__data.price__" <!--__validationAttributes.price__--> />
+											<!--__validationMessages.price__-->
 										</div>
 									</div>
 								</div>
@@ -67,5 +67,5 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal-backdrop fade show" style="display: ${display}"></div>
+	<div class="modal-backdrop fade show" style="display: __display__"></div>
 </div>

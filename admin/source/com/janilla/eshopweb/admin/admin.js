@@ -21,15 +21,68 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import Layout from './Layout.js';
+import Catalog from './Catalog.js';
+import NavMenu from './NavMenu.js';
+import RenderEngine from './RenderEngine.js';
+import Toast from './Toast.js';
 
-const l = () => {
-	const a = new Layout();
-	a.api = {
-		url: `${apiUrl}`
+class Layout {
+
+	selector = () => document.querySelector('#admin');
+
+	api = {
+		url: this.selector().dataset.apiUrl,
+		headers: {}
 	};
-	a.selector = () => document.querySelector('#admin');
-	a.run();
+
+	user;
+
+	run = async () => {
+		const s = await fetch('/user');
+		this.user = s.ok ? await s.json() : null;
+		if (this.user) {
+			this.api.headers = {
+				Authorization: `Bearer ${this.user.token}`
+			};
+			const r = new RenderEngine();
+			this.selector().innerHTML = await r.render(this, 'Layout');
+			this.listen();
+		} else
+			location.href = '/user/login?returnUrl=%2fAdmin';
+	}
+
+	render = async engine => {
+		if (engine.isRendering(this, 'sidebar'))
+			return this.user.roles.includes('Administrators') ? await engine.render(this, 'Layout-sidebar') : null;
+
+		if (engine.isRendering(this, 'navMenu')) {
+			this.navMenu = new NavMenu();
+			this.navMenu.selector = () => this.selector().querySelector('.sidebar').firstElementChild;
+			return this.navMenu;
+		}
+
+		if (engine.isRendering(this, 'toast')) {
+			this.toast = new Toast();
+			this.toast.selector = () => this.selector().querySelector('.content').firstElementChild;
+			return this.toast;
+		}
+
+		if (engine.isRendering(this, 'catalog')) {
+			if (this.user.roles.includes('Administrators')) {
+				this.catalog = new Catalog();
+				this.catalog.selector = () => this.selector().querySelector('.content').lastElementChild;
+				return this.catalog;
+			} else
+				return await engine.render(this, 'Layout-unauthorized');
+		}
+	}
+
+	listen = () => {
+		this.navMenu?.listen();
+		this.toast.listen();
+		this.catalog?.listen();
+	}
 }
 
+const l = () => new Layout().run();
 document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', l) : l();

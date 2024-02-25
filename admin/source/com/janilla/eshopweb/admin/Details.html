@@ -1,9 +1,9 @@
 <div>
-	<div class="modal Show" tabindex="-1" role="dialog" style="display: ${display}">
+	<div class="modal Show" tabindex="-1" role="dialog" style="display: __display__">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Details ${item.name}</h5>
+					<h5 class="modal-title" id="exampleModalLabel">Details __item.name__</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">×</span>
 					</button>
@@ -11,18 +11,18 @@
 				<div class="modal-body">
 					<div class="container">
 						<div class="row">
-							<img class="col-md-6 esh-picture" src="${item.pictureUri}" />
+							<img class="col-md-6 esh-picture" src="__item.pictureUri__" />
 							<dl class="col-md-6 dl-horizontal">
 								<dt>Name</dt>
-								<dd>${item.name}</dd>
+								<dd>__item.name__</dd>
 								<dt>Description</dt>
-								<dd>${item.description}</dd>
+								<dd>__item.description__</dd>
 								<dt>Brand</dt>
-								<dd>${item.catalogBrand}</dd>
+								<dd>__item.catalogBrand__</dd>
 								<dt>Type</dt>
-								<dd>${item.catalogType}</dd>
+								<dd>__item.catalogType__</dd>
 								<dt>Price</dt>
-								<dd>${item.price}</dd>
+								<dd>__item.price__</dd>
 							</dl>
 						</div>
 					</div>
@@ -34,5 +34,5 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal-backdrop fade show" style="display: ${display}"></div>
+	<div class="modal-backdrop fade show" style="display: __display__"></div>
 </div>

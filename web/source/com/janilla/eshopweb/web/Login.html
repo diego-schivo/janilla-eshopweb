@@ -5,16 +5,16 @@
 			<section>
 				<form method="post">
 					<hr />
-					#{validationSummary}
+					<!--__validationSummary__-->
 					<div class="form-group">
 						<label for="email">Email</label>
-						<input class="form-control" type="email" id="email" name="email" value="${form.email}" />
-						#{validationMessages.email}
+						<input class="form-control" type="email" id="email" name="email" value="__form.email__" />
+						<!--__validationMessages.email__-->
 					</div>
 					<div class="form-group">
 						<label for="password">Password</label>
-						<input class="form-control" type="password" id="password" name="password" value="${form.password}" />
-						#{validationMessages.password}
+						<input class="form-control" type="password" id="password" name="password" value="__form.password__" />
+						<!--__validationMessages.password__-->
 					</div>
 					<div class="form-group">
 						<div class="checkbox">

@@ -52,36 +52,39 @@ class Catalog {
 	}
 
 	render = async engine => {
-		switch (engine.key) {
-			case undefined:
-				this.engine = engine.clone();
-				return await engine.render(this, 'Catalog');
+		if (engine.isRendering(this)) {
+			this.engine = engine.clone();
+			return await engine.render(this, 'Catalog');
+		}
 
-			case 'catalogType':
-				return this.catalogTypes.find(x => x.id === engine.target.catalogType)?.name;
+		if (engine.isRendering(this, 'catalogType'))
+			return this.catalogTypes.find(x => x.id === engine.target.catalogType)?.name;
 
-			case 'catalogBrand':
-				return this.catalogBrands.find(x => x.id === engine.target.catalogBrand)?.name;
+		if (engine.isRendering(this, 'catalogBrand'))
+			return this.catalogBrands.find(x => x.id === engine.target.catalogBrand)?.name;
 
-			case 'details':
-				this.details = new Details();
-				this.details.selector = () => Array.from(this.selector().children).at(-4);
-				return this.details;
+		if (engine.isRendering(this, 'details')) {
+			this.details = new Details();
+			this.details.selector = () => Array.from(this.selector().children).at(-4);
+			return this.details;
+		}
 
-			case 'edit':
-				this.edit = new Edit();
-				this.edit.selector = () => Array.from(this.selector().children).at(-3);
-				return this.edit;
+		if (engine.isRendering(this, 'edit')) {
+			this.edit = new Edit();
+			this.edit.selector = () => Array.from(this.selector().children).at(-3);
+			return this.edit;
+		}
 
-			case 'create':
-				this.create = new Create();
-				this.create.selector = () => Array.from(this.selector().children).at(-2);
-				return this.create;
+		if (engine.isRendering(this, 'create')) {
+			this.create = new Create();
+			this.create.selector = () => Array.from(this.selector().children).at(-2);
+			return this.create;
+		}
 
-			case 'delete':
-				this.delete = new Delete();
-				this.delete.selector = () => this.selector().lastElementChild;
-				return this.delete;
+		if (engine.isRendering(this, 'delete')) {
+			this.delete = new Delete();
+			this.delete.selector = () => this.selector().lastElementChild;
+			return this.delete;
 		}
 	}
 
