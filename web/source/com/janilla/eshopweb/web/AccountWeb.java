@@ -155,7 +155,7 @@ public class AccountWeb {
 
 		@Render(template = "ValidationSummary.html")
 		public Stream<@Render(template = """
-				<li>____</li>
+				<li>${}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()
 					? validationMessages.stream().map(Entry::getValue)
@@ -176,7 +176,7 @@ public class AccountWeb {
 
 		@Render(template = "ValidationSummary.html")
 		public Stream<@Render(template = """
-				<li>____</li>
+				<li>${}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()
 					? validationMessages.stream().map(Entry::getValue)

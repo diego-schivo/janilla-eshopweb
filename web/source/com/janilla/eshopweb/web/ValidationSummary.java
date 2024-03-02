@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 import com.janilla.web.Render;
 
 @Render(template = "ValidationSummary.html")
-public class ValidationSummary implements Iterable<@Render(template = "<li>____</li>\n") String> {
+public class ValidationSummary implements Iterable<@Render(template = "<li>${}</li>\n") String> {
 
 	protected ValidationMessages validationMessages;
 

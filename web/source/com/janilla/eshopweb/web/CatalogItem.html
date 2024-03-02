@@ -1,13 +1,13 @@
 <div class="esh-catalog-item col-md-4">
 	<form method="post" action="/basket">
-		<img class="esh-catalog-thumbnail" src="__pictureUri__" />
+		<img class="esh-catalog-thumbnail" src="${pictureUri}" />
 		<input class="esh-catalog-button" type="submit" value="[ ADD TO BASKET ]" />
 		<div class="esh-catalog-name">
-			<span>__name__</span>
+			<span>${name}</span>
 		</div>
 		<div class="esh-catalog-price">
-			<span>__price__</span>
+			<span>${price}</span>
 		</div>
-		<input type="hidden" name="id" value="__id__" />
+		<input type="hidden" name="id" value="${id}" />
 	</form>
 </div>

@@ -1,23 +1,23 @@
 <h4>Profile</h4>
-<!--__statusMessage__-->
+<!--${statusMessage}-->
 <div class="row">
 	<div class="col-md-6">
 		<form method="post">
-			<!--__validationSummary__-->
+			<!--${validationSummary}-->
 			<div class="form-group">
 				<label for="userName">Username</label>
-				<input class="form-control" disabled type="text" id="userName" name="userName" value="__user.userName__" />
+				<input class="form-control" disabled type="text" id="userName" name="userName" value="${user.userName}" />
 			</div>
 			<div class="form-group">
 				<label for="email">Email</label>
-				<input class="form-control" type="email" id="email" name="email" value="__user.email__" />
+				<input class="form-control" type="email" id="email" name="email" value="${user.email}" />
 				<button class="btn btn-link" formaction="/manage/send-verification-email">Send verification email</button>
-				<!--__validationMessages.email__-->
+				<!--${validationMessages.email}-->
 			</div>
 			<div class="form-group">
 				<label for="phoneNumber">Phone number</label>
-				<input class="form-control" type="tel" id="phoneNumber" name="phoneNumber" value="__user.phoneNumber__" />
-				<!--__validationMessages.phoneNumber__-->
+				<input class="form-control" type="tel" id="phoneNumber" name="phoneNumber" value="${user.phoneNumber}" />
+				<!--${validationMessages.phoneNumber}-->
 			</div>
 			<button type="submit" class="btn btn-default">Save</button>
 		</form>

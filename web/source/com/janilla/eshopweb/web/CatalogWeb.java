@@ -91,7 +91,7 @@ public class CatalogWeb {
 	}
 
 	@Render(template = """
-			<option value="__value__" <!--__selectedAttribute__-->>__text__</option>
+			<option value="${value}" data-${selectedAttribute}>${text}</option>
 			""")
 	public record Option(String value, String text, boolean selected) {
 

@@ -38,13 +38,13 @@ public class AdminWeb {
 
 	@Handle(method = "GET", path = "/admin")
 	public Admin getAdmin() {
-		var u = configuration.getProperty("eshopweb.admin.api.url");
+		var u = configuration.getProperty("eshopweb.api.url");
 		return new Admin(u);
 	}
 
 //	@Handle(method = "GET", path = "/admin.js")
 //	public Script getScript() {
-//		var u = configuration.getProperty("eshopweb.admin.api.url");
+//		var u = configuration.getProperty("eshopweb.api.url");
 //		return new Script(u);
 //	}
 

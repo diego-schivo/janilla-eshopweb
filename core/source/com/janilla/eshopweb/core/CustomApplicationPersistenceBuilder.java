@@ -47,7 +47,7 @@ public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceB
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
-			var p = c.getProperty("eshopweb.database.path");
+			var p = c.getProperty("eshopweb.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
 			file = Path.of(p);
@@ -75,18 +75,18 @@ public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceB
 				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogType.class).create(z), true);
 			}
 			for (var x : """
-					2	2	.NET Bot Black Sweatshirt	.NET Bot Black Sweatshirt	19.5	/1.png
-					1	2	.NET Black & White Mug	.NET Black & White Mug	8.5	/2.png
-					2	5	Prism White T-Shirt	Prism White T-Shirt	12	/3.png
-					2	2	.NET Foundation Sweatshirt	.NET Foundation Sweatshirt	12	/4.png
-					3	5	Roslyn Red Sheet	Roslyn Red Sheet	8.5	/5.png
-					2	2	.NET Blue Sweatshirt	.NET Blue Sweatshirt	12	/6.png
-					2	5	Roslyn Red T-Shirt	Roslyn Red T-Shirt	12	/7.png
-					2	5	Kudu Purple Sweatshirt	Kudu Purple Sweatshirt	8.5	/8.png
-					1	5	Cup<T> White Mug	Cup<T> White Mug	12	/9.png
-					3	2	.NET Foundation Sheet	.NET Foundation Sheet	12	/10.png
-					3	2	Cup<T> Sheet	Cup<T> Sheet	8.5	/11.png
-					2	5	Prism White TShirt	Prism White TShirt	12	/12.png""".split("\n")) {
+					2	2	.NET Bot Black Sweatshirt	.NET Bot Black Sweatshirt	19.5	/1.jpg
+					1	2	.NET Black & White Mug	.NET Black & White Mug	8.5	/2.jpg
+					2	5	Prism White T-Shirt	Prism White T-Shirt	12	/3.jpg
+					2	2	.NET Foundation Sweatshirt	.NET Foundation Sweatshirt	12	/4.jpg
+					3	5	Roslyn Red Sheet	Roslyn Red Sheet	8.5	/5.jpg
+					2	2	.NET Blue Sweatshirt	.NET Blue Sweatshirt	12	/6.jpg
+					2	5	Roslyn Red T-Shirt	Roslyn Red T-Shirt	12	/7.jpg
+					2	5	Kudu Purple Sweatshirt	Kudu Purple Sweatshirt	8.5	/8.jpg
+					1	5	Cup<T> White Mug	Cup<T> White Mug	12	/9.jpg
+					3	2	.NET Foundation Sheet	.NET Foundation Sheet	12	/10.jpg
+					3	2	Cup<T> Sheet	Cup<T> Sheet	8.5	/11.jpg
+					2	5	Prism White TShirt	Prism White TShirt	12	/12.jpg""".split("\n")) {
 				var y = x.split("\t");
 				var z = new CatalogItem();
 				z.setCatalogType(Long.valueOf(y[0]));

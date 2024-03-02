@@ -41,7 +41,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
 	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
-		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.disable-unsafe-actions"))) {
+		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo"))) {
 			var q = exchange.getRequest();
 			switch (q.getMethod().name()) {
 			case "GET":
