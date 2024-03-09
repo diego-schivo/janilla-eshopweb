@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.eshopweb.core.CatalogItem;
@@ -39,7 +40,13 @@ import com.janilla.web.Render;
 
 public class BasketWeb {
 
+	Properties configuration;
+
 	private Persistence persistence;
+
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
+	}
 
 	public void setPersistence(Persistence persistence) {
 		this.persistence = persistence;
@@ -60,16 +67,24 @@ public class BasketWeb {
 	}
 
 	@Handle(method = "POST", path = "/basket")
-	public URI addItem(@Parameter(name = "id") Long id, HttpExchange exchange) throws IOException {
-		var i = persistence.getCrud(CatalogItem.class).read(id);
+	public URI addItem(@Parameter(name = "id") long id, HttpExchange exchange) throws IOException {
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
-
-		var j = new BasketItem();
-		j.setCatalogItem(i.getId());
-		j.setUnitPrice(i.getPrice());
-		j.setQuantity(1);
-		j.setBasket(b.getId());
-		persistence.getCrud(BasketItem.class).create(j);
+		var ii = persistence.getCrud(BasketItem.class).filter("basket", b.getId());
+		var i = persistence.getCrud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
+				.orElse(null);
+		if (i != null)
+			persistence.getCrud(BasketItem.class).update(i.getId(), x -> x.setQuantity(x.getQuantity() + 1));
+		else {
+			if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo")) && ii.length >= 10)
+				throw new MethodBlockedException();
+			var j = persistence.getCrud(CatalogItem.class).read(id);
+			i = new BasketItem();
+			i.setCatalogItem(j.getId());
+			i.setUnitPrice(j.getPrice());
+			i.setQuantity(1);
+			i.setBasket(b.getId());
+			persistence.getCrud(BasketItem.class).create(i);
+		}
 
 		return URI.create("/basket");
 	}

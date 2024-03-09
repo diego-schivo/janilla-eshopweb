@@ -47,8 +47,12 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 			case "GET":
 				break;
 			default:
-				if (!q.getURI().getPath().equals("/user/logout"))
+				switch (q.getURI().getPath()) {
+				case "/basket", "/basket/checkout", "/basket/update", "/user/login", "/user/logout":
+					break;
+				default:
 					throw new HandleException(new MethodBlockedException());
+				}
 			}
 		}
 		super.handle(invocation, exchange);

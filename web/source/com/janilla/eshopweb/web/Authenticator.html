@@ -3,3 +3,150 @@
 <h5>Authenticator app</h5>
 <!--${appCreate}-->
 <!--${appUpdate}-->
+
+<template id="Authenticator-AppCreate">
+	<a class="btn btn-default" href="/account/authenticator/enable">Add authenticator app</a>
+</template>
+
+<template id="Authenticator-AppUpdate">
+	<a class="btn btn-default" href="/account/authenticator/enable">Configure authenticator app</a>
+	<a class="btn btn-default" href="/account/authenticator/reset">Reset authenticator key</a>
+</template>
+
+<template id="Authenticator-Disable">
+	<h2>Disable two-factor authentication (2FA)</h2>
+	<div class="alert alert-warning" role="alert">
+		<p>
+			<span class="glyphicon glyphicon-warning-sign"></span>
+			<strong>This action only disables 2FA.</strong>
+		</p>
+		<p>
+			Disabling 2FA does not change the keys used in authenticator apps.
+			If you wish to change the key used in an authenticator app you should
+			<a href="/account/authenticator/reset">reset your authenticator keys.</a>
+		</p>
+	</div>
+	<div>
+		<form method="post" class="form-group">
+			<button class="btn btn-danger" type="submit">Disable 2FA</button>
+		</form>
+	</div>
+</template>
+
+<template id="Authenticator-Enable">
+	<h4>Enable authenticator</h4>
+	<div>
+		<p>To use an authenticator app go through the following steps:</p>
+		<ol class="list">
+			<li>
+				<p>
+					Download a two-factor authenticator app like Microsoft Authenticator for
+					<a href="https://go.microsoft.com/fwlink/?Linkid=825071">Windows Phone</a>,
+					<a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
+					<a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or Google Authenticator for
+					<a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and
+					<a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
+				</p>
+			</li>
+			<li>
+				<p>
+					Scan the QR Code or enter this key
+					<kbd>${sharedKey}</kbd> into your two factor authenticator app.
+					Spaces and casing do not matter.
+				</p>
+				<div id="qrCode"></div>
+				<div id="qrCodeData" data-url="${qrCode}"></div>
+			</li>
+			<li>
+				<p>
+					Once you have scanned the QR code or input the key above, your two factor authentication app will provide you with a unique code.
+					Enter the code in the confirmation box below.
+				</p>
+				<div class="row">
+					<div class="col-md-6">
+						<form method="post">
+							<div class="form-group">
+								<label class="control-label" for="code">Verification Code</label>
+								<input class="form-control" autocomplete="off" type="text" id="code" maxlength="7" name="code" />
+								<span class="text-danger field-validation-valid"></span>
+							</div>
+							<button type="submit" class="btn btn-default">Verify</button>
+						</form>
+					</div>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<script>
+		window.addEventListener("load", () => {
+		  const uri = document.getElementById("qrCodeData").getAttribute('data-url');
+		  new QRCode(document.getElementById("qrCode"),
+		    {
+		      text: uri,
+		      width: 150,
+		      height: 150
+		    });
+		});
+	</script>
+</template>
+
+<template id="Authenticator-Manage">
+	<a class="btn btn-default" href="/account/authenticator/disable">Disable 2FA</a>
+	<a class="btn btn-default" href="/account/authenticator/recovery/reset">Reset recovery codes</a>
+</template>
+
+<template id="Authenticator-Recovery">
+	<h4>Recovery codes</h4>
+	<div class="alert alert-warning" role="alert">
+		<p>
+			<span class="glyphicon glyphicon-warning-sign"></span>
+			<strong>Put these codes in a safe place.</strong>
+		</p>
+		<p>If you lose your device and don't have the recovery codes you will lose access to your account.</p>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<!--${codeStream}-->
+		</div>
+	</div>
+</template>
+
+<template id="Authenticator-RecoveryReset">
+	<h2>Generate two-factor authentication (2FA) recovery codes</h2>
+	<div class="alert alert-warning" role="alert">
+	    <p>
+	        <span class="glyphicon glyphicon-warning-sign"></span>
+	        <strong>This action generates new recovery codes.</strong>
+	    </p>
+	    <p>If you lose your device and don't have the recovery codes you will lose access to your account.</p>
+	    <p>
+	        Generating new recovery codes does not change the keys used in authenticator apps.
+	        If you wish to change the key used in an authenticator app you should
+	        <a href="/manage/reset-authenticator-warning">reset your authenticator keys.</a>
+	    </p>
+	</div>
+	<div>
+	    <form method="post" class="form-group">
+	        <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
+	    </form>
+	</div>
+</template>
+
+<template id="Authenticator-Reset">
+	<h4>Reset authenticator key</h4>
+	<div class="alert alert-warning" role="alert">
+		<p>
+			<span class="glyphicon glyphicon-warning-sign"></span>
+			<strong>If you reset your authenticator key your authenticator app will not work until you reconfigure it.</strong>
+		</p>
+		<p>
+			This process disables 2FA until you verify your authenticator app and will also reset your 2FA recovery codes.
+			If you do not complete your authenticator app configuration you may lose access to your account.
+		</p>
+	</div>
+	<div>
+		<form method="post" class="form-group">
+			<button class="btn btn-danger" type="submit">Reset authenticator key</button>
+		</form>
+	</div>
+</template>

@@ -11,3 +11,16 @@
 		<!--${items}-->
 	</div>
 </div>
+
+<template id="Order-History-Item">
+	<article class="esh-orders-items row">
+		<section class="esh-orders-item col-xs-2">${order.id}</section>
+		<section class="esh-orders-item col-xs-4">${order.orderDate}</section>
+		<section class="esh-orders-item col-xs-2">$ ${total}</section>
+		<section class="esh-orders-item col-xs-2">Pending</section>
+		<section class="esh-orders-item col-xs-1">
+			<a class="esh-orders-link" href="/order/detail/${order.id}">Detail</a>
+		</section>
+		<section class="esh-orders-item col-xs-1"></section>
+	</article>
+</template>

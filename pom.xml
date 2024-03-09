@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>com.janilla</groupId>
 			<artifactId>janilla</artifactId>
-			<version>0.2.0</version>
+			<version>0.3.0</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -59,6 +59,22 @@
 				</excludes>
 			</resource>
 		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.2.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>java</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<name>Janilla eShopOnWeb</name>
 	<description>Sample Janilla reference application.</description>

@@ -84,6 +84,11 @@ abstract class CustomHttpExchange extends HttpExchange {
 		var c = persistence.getCrud(Basket.class);
 		var b = i != null ? c.read(c.find("buyer", i)) : null;
 		if (b == null && createBasket) {
+
+			if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo"))
+					&& persistence.getCrud(Basket.class).count() >= 1000)
+				throw new MethodBlockedException();
+
 			var d = new Basket();
 			d.setBuyer(u != null ? u.getUserName() : UUID.randomUUID().toString());
 			c.create(d);

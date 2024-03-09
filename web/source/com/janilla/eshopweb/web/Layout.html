@@ -53,3 +53,48 @@
 	<script src="//cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@04f46c6a0708418cb7b96fc563eacae0fbf77674/qrcode.min.js"></script>
 </body>
 </html>
+
+<template id="Layout-Basket">
+	<a class="esh-basketstatus" href="/basket">
+		<div class="esh-basketstatus-image">
+			<img src="/cart.png" />
+		</div>
+		<div class="esh-basketstatus-badge">${}</div>
+	</a>
+</template>
+
+<template id="Layout-Form">
+	<form method="post" id="logoutForm" class="navbar-right" action="/user/logout">
+		<section class="esh-identity-section">
+			<div class="esh-identity-name">${user.userName}</div>
+			<img class="esh-identity-image" src="/arrow-down.png">
+		</section>
+		<section class="esh-identity-drop">
+			<!--${admin}-->
+			<a class="esh-identity-item" href="/order/history">
+				<div class="esh-identity-name esh-identity-name--upper">My orders</div>
+			</a>
+			<a class="esh-identity-item" href="/account/profile">
+				<div class="esh-identity-name esh-identity-name--upper">My account</div>
+			</a>
+			<a class="esh-identity-item" href="javascript:document.getElementById('logoutForm').submit()">
+				<div class="esh-identity-name esh-identity-name--upper">Log Out</div>
+				<img class="esh-identity-image" src="/logout.png">
+			</a>
+		</section>
+	</form>
+</template>
+
+<template id="Layout-Form-Admin">
+	<a class="esh-identity-item" href="/admin">
+		<div class="esh-identity-name esh-identity-name--upper">Admin</div>
+	</a>
+</template>
+
+<template id="Layout-Login">
+	<section class="esh-identity-section">
+		<div class="esh-identity-item">
+			<a class="esh-identity-name esh-identity-name--upper" href="/user/login">Login</a>
+		</div>
+	</section>
+</template>
