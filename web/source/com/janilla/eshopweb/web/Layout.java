@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.web;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
@@ -54,13 +53,18 @@ public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.htm
 			.withZone(ZoneOffset.UTC);
 
 	@Override
-	public Object render(RenderEngine engine) throws IOException {
-		var o = engine.getObject();
-		return o != null ? switch (o) {
-		case BigDecimal x -> currencyFormat.format(x);
-		case Instant x -> dateTimeFormatter.format(x);
-		default -> CANNOT_RENDER;
-		} : CANNOT_RENDER;
+	public boolean evaluate(RenderEngine engine) {
+		record A(BigDecimal decimal) {
+		}
+		record B(Instant instant) {
+		}
+		return engine.match(A.class, (x, y) -> {
+			if (x.decimal != null)
+				y.setValue(currencyFormat.format(x.decimal));
+		}) || engine.match(B.class, (x, y) -> {
+			if (x.instant != null)
+				y.setValue(dateTimeFormatter.format(x.instant));
+		});
 	}
 
 	@Render(template = "Layout-Login.html")

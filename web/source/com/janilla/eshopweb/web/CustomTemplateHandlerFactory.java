@@ -34,9 +34,9 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	@Override
 	protected void render(ObjectAndType input, HttpExchange exchange) throws IOException {
-		var o = input.object();
+		var o = input.getValue();
 		if (o instanceof Page p)
-			input = new ObjectAndType(toLayout(p, exchange), null);
+			input = new ObjectAndType(null, toLayout(p, exchange), null);
 		super.render(input, exchange);
 	}
 

@@ -69,7 +69,7 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 		if (e instanceof Page p) {
 			var l = CustomTemplateHandlerFactory.toLayout(p, exchange);
-			var h = mainFactory.createHandler(new ObjectAndType(l, null), exchange);
+			var h = mainFactory.createHandler(new ObjectAndType(null, l, null), exchange);
 			h.accept(exchange);
 		}
 	}
