@@ -57,9 +57,9 @@ class NavMenu {
 		return this.engine.stack[0].target;
 	}
 
-	render = async engine => {
+	render = async e => {
 		if (engine.isRendering(this)) {
-			this.engine = engine.clone();
+			this.engine = e.clone();
 			return await engine.render(this, 'NavMenu');
 		}
 

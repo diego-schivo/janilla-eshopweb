@@ -26,7 +26,7 @@ package com.janilla.eshopweb.web;
 import java.io.IOException;
 import java.net.URI;
 
-import com.janilla.frontend.RenderEngine.ObjectAndType;
+import com.janilla.frontend.RenderEngine.Entry;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpResponse.Status;
 import com.janilla.net.Net;
@@ -69,7 +69,7 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 		if (e instanceof Page p) {
 			var l = CustomTemplateHandlerFactory.toLayout(p, exchange);
-			var h = mainFactory.createHandler(new ObjectAndType(null, l, null), exchange);
+			var h = mainFactory.createHandler(new Entry(null, l, null), exchange);
 			h.accept(exchange);
 		}
 	}

@@ -51,7 +51,7 @@ class Layout {
 			location.href = '/user/login?returnUrl=%2fAdmin';
 	}
 
-	render = async engine => {
+	render = async e => {
 		if (engine.isRendering(this, 'sidebar'))
 			return this.user.roles.includes('Administrators') ? await engine.render(this, 'Layout-sidebar') : null;
 

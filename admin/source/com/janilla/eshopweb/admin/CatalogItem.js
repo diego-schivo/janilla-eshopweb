@@ -27,7 +27,7 @@ class CatalogItem {
 
 	item;
 
-	render = async engine => {
+	render = async e => {
 		if (engine.isRendering(this))
 			return await engine.render(this, 'CatalogItem');
 	}

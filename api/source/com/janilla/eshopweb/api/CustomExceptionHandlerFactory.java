@@ -25,7 +25,7 @@ package com.janilla.eshopweb.api;
 
 import java.io.IOException;
 
-import com.janilla.frontend.RenderEngine.ObjectAndType;
+import com.janilla.frontend.RenderEngine.Entry;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
@@ -40,10 +40,10 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	}
 
 	@Override
-	protected void handle(Error error, HttpExchange context) throws IOException {
-		super.handle(error, context);
-		var e = context.getException();
+	protected void handle(Error error, HttpExchange exchange) throws IOException {
+		super.handle(error, exchange);
+		var e = exchange.getException();
 		if (e instanceof Exception)
-			mainFactory.createHandler(new ObjectAndType(null, e.getMessage(), null), context).accept(context);
+			mainFactory.createHandler(new Entry(null, e.getMessage(), null), exchange).accept(exchange);
 	}
 }
