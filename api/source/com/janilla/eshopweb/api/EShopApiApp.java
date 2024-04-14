@@ -28,7 +28,7 @@ import java.io.UncheckedIOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
+import com.janilla.eshopweb.core.CustomPersistenceBuilder;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
@@ -59,7 +59,7 @@ public class EShopApiApp {
 	private Properties configuration;
 
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomApplicationPersistenceBuilder();
+		var b = new CustomPersistenceBuilder();
 		b.setApplication(this);
 		return b.build();
 	});

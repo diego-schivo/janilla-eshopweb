@@ -30,7 +30,7 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
-import com.janilla.eshopweb.core.CustomApplicationPersistenceBuilder;
+import com.janilla.eshopweb.core.CustomPersistenceBuilder;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
@@ -59,7 +59,7 @@ public class EShopWebApp {
 	private Properties configuration;
 
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomApplicationPersistenceBuilder();
+		var b = new CustomPersistenceBuilder();
 		b.setApplication(this);
 		return b.build();
 	});

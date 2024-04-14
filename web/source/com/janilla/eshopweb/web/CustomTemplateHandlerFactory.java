@@ -26,6 +26,7 @@ package com.janilla.eshopweb.web;
 import java.io.IOException;
 
 import com.janilla.eshopweb.core.BasketItem;
+import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.RenderEngine.Entry;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.TemplateHandlerFactory;
@@ -36,7 +37,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	protected void render(Entry input, HttpExchange exchange) throws IOException {
 		var o = input.getValue();
 		if (o instanceof Page p)
-			input = new Entry(null, toLayout(p, exchange), null);
+			input = RenderEngine.Entry.of(null, toLayout(p, exchange), null);
 		super.render(input, exchange);
 	}
 

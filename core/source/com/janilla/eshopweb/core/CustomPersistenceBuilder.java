@@ -36,7 +36,7 @@ import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 
-public class CustomApplicationPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() throws IOException {
