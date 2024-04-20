@@ -43,7 +43,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		if (file == null) {
 			Properties c;
 			try {
-				c = (Properties) Reflection.getter(application.getClass(), "configuration").invoke(application);
+				c = (Properties) Reflection.property(application.getClass(), "configuration").get(application);
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
