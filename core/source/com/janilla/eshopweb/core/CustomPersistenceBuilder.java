@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.core;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.file.Files;
@@ -39,14 +38,9 @@ import com.janilla.reflect.Reflection;
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
-	public Persistence build() throws IOException {
+	public Persistence build() {
 		if (file == null) {
-			Properties c;
-			try {
-				c = (Properties) Reflection.property(application.getClass(), "configuration").get(application);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
+			var c = (Properties) Reflection.property(application.getClass(), "configuration").get(application);
 			var p = c.getProperty("eshopweb.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
@@ -54,6 +48,13 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		}
 		var e = Files.exists(file);
 		var p = super.build();
+		p.setTypeResolver(x -> {
+			try {
+				return Class.forName("com.janilla.eshopweb.core." + x.replace('.', '$'));
+			} catch (ClassNotFoundException f) {
+				throw new RuntimeException(f);
+			}
+		});
 		if (!e) {
 			for (var x : """
 					Azure
@@ -63,7 +64,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 					Other""".split("\n")) {
 				var z = new CatalogBrand();
 				z.setName(x);
-				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogBrand.class).create(z), true);
+//				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogBrand.class).create(z), true);
+				p.getCrud(CatalogBrand.class).create(z);
 			}
 			for (var x : """
 					Mug
@@ -72,7 +74,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 					USB Memory Stick""".split("\n")) {
 				var z = new CatalogType();
 				z.setName(x);
-				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogType.class).create(z), true);
+//				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogType.class).create(z), true);
+				p.getCrud(CatalogType.class).create(z);
 			}
 			for (var x : """
 					2	2	.NET Bot Black Sweatshirt	.NET Bot Black Sweatshirt	19.5	/1.jpg
@@ -95,7 +98,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				z.setName(y[3]);
 				z.setPrice(new BigDecimal(y[4]));
 				z.setPictureUri(URI.create(y[5]));
-				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogItem.class).create(z), true);
+//				p.getDatabase().perform((ss, ii) -> p.getCrud(CatalogItem.class).create(z), true);
+				p.getCrud(CatalogItem.class).create(z);
 			}
 			for (var x : """
 					demouser@microsoft.com	Pass@word1
@@ -107,7 +111,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				ApplicationUser.setHashAndSalt(z, y[1]);
 				z.setRoles(IntStream.range(2, y.length).mapToObj(i -> y[i]).toList());
 				z.setTwoFactor(new ApplicationUser.TwoFactor(false, null, null));
-				p.getDatabase().perform((ss, ii) -> p.getCrud(ApplicationUser.class).create(z), true);
+//				p.getDatabase().perform((ss, ii) -> p.getCrud(ApplicationUser.class).create(z), true);
+				p.getCrud(ApplicationUser.class).create(z);
 			}
 		}
 		return p;

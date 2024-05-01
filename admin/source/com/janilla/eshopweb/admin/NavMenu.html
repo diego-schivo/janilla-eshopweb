@@ -7,16 +7,16 @@
 	</div>
 	<div class="collapse">
 		<ul class="nav flex-column">
-			<!--${items}-->
+			<{items}>
 		</ul>
 	</div>
 </div>
 
 <template id="NavMenu-Item">
 	<li class="nav-item px-3">
-		<a href="${href}" class="nav-link ${activeClass}" <!--${currentAttribute}-->>
-			<span class="oi ${iconClass}" aria-hidden="true"></span>
-			${text}
+		<a href="{href}" class="nav-link {activeClass}" <{currentAttribute}>>
+			<span class="oi {iconClass}" aria-hidden="true"></span>
+			{text}
 		</a>
 	</li>
 </template>

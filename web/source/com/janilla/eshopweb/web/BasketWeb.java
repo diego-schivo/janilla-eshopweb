@@ -73,7 +73,10 @@ public class BasketWeb {
 		var i = persistence.getCrud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
 				.orElse(null);
 		if (i != null)
-			persistence.getCrud(BasketItem.class).update(i.getId(), x -> x.setQuantity(x.getQuantity() + 1));
+			persistence.getCrud(BasketItem.class).update(i.getId(), x -> {
+				x.setQuantity(x.getQuantity() + 1);
+				return x;
+			});
 		else {
 			if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo")) && ii.length >= 10)
 				throw new MethodBlockedException();
@@ -96,7 +99,10 @@ public class BasketWeb {
 			for (var i : view.items) {
 				var q = i.basketItem.getQuantity();
 				if (q > 0)
-					c.update(i.basketItem.getId(), x -> x.setQuantity(q));
+					c.update(i.basketItem.getId(), x -> {
+						x.setQuantity(q);
+						return x;
+					});
 				else
 					c.delete(i.basketItem.getId());
 			}

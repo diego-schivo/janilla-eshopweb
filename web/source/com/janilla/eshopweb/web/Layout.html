@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${page.title} - Janilla.eShopOnWeb</title>
+<title>{page.title} - Janilla.eShopOnWeb</title>
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/app.css" />
 <link rel="stylesheet" href="/app.component.css" />
@@ -26,17 +26,17 @@
 					</section>
 					<section class="col-lg-4 col-md-5 col-xs-12">
 						<div class="esh-identity">
-							<!--${login}-->
-							<!--${form}-->
+							<{login}>
+							<{form}>
 						</div>
 					</section>
 					<section class="col-lg-1 col-xs-12">
-						<!--${basket}-->
+						<{basket}>
 					</section>
 				</article>
 			</div>
 		</header>
-		<!--${page}-->
+		<{page}>
 		<footer class="esh-app-footer footer">
 			<div class="container">
 				<article class="row">
@@ -59,18 +59,18 @@
 		<div class="esh-basketstatus-image">
 			<img src="/cart.png" />
 		</div>
-		<div class="esh-basketstatus-badge">${}</div>
+		<div class="esh-basketstatus-badge">{}</div>
 	</a>
 </template>
 
 <template id="Layout-Form">
 	<form method="post" id="logoutForm" class="navbar-right" action="/user/logout">
 		<section class="esh-identity-section">
-			<div class="esh-identity-name">${user.userName}</div>
+			<div class="esh-identity-name">{user.userName}</div>
 			<img class="esh-identity-image" src="/arrow-down.png">
 		</section>
 		<section class="esh-identity-drop">
-			<!--${admin}-->
+			<{admin}>
 			<a class="esh-identity-item" href="/order/history">
 				<div class="esh-identity-name esh-identity-name--upper">My orders</div>
 			</a>

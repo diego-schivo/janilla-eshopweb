@@ -3,13 +3,13 @@
 		<img class="esh-catalog-title" src="/main_banner_text.png" />
 	</div>
 </section>
-<!--${filters}-->
+<{filters}>
 <div class="container">
-	<!--${pager}-->
+	<{pager}>
 	<div class="esh-catalog-items row">
-		<!--${items}-->
+		<{items}>
 	</div>
-	<!--${pager}-->
+	<{pager}>
 </div>
 
 <template id="Catalog-Filters">
@@ -18,12 +18,12 @@
 			<form method="get">
 				<label class="esh-catalog-label" data-title="brand">
 					<select class="esh-catalog-filter" id="brand" name="brand">
-						<!--${brandOptions}-->
+						<{brandOptions}>
 					</select>
 				</label>
 				<label class="esh-catalog-label" data-title="type">
 					<select class="esh-catalog-filter" id="type" name="type">
-						<!--${typeOptions}-->
+						<{typeOptions}>
 					</select>
 				</label>
 				<input class="esh-catalog-send" type="image" src="/arrow-right.svg" />
@@ -35,15 +35,15 @@
 <template id="CatalogItem">
 	<div class="esh-catalog-item col-md-4">
 		<form method="post" action="/basket">
-			<img class="esh-catalog-thumbnail" src="${pictureUri}" />
+			<img class="esh-catalog-thumbnail" src="{pictureUri}" />
 			<input class="esh-catalog-button" type="submit" value="[ ADD TO BASKET ]" />
 			<div class="esh-catalog-name">
-				<span>${name}</span>
+				<span>{name}</span>
 			</div>
 			<div class="esh-catalog-price">
-				<span>${price}</span>
+				<span>{price}</span>
 			</div>
-			<input type="hidden" name="id" value="${id}" />
+			<input type="hidden" name="id" value="{id}" />
 		</form>
 	</div>
 </template>
@@ -54,13 +54,13 @@
 			<article class="esh-pager-wrapper row">
 				<nav>
 					<div class="col-md-2 col-xs-12">
-						<a class="esh-pager-item-left esh-pager-item--navigable esh-pager-item ${previous.enabledClass}" id="Previous" aria-label="Previous" href="${previous.uri}">Previous</a>
+						<a class="esh-pager-item-left esh-pager-item--navigable esh-pager-item {previous.enabledClass}" id="Previous" aria-label="Previous" href="{previous.uri}">Previous</a>
 					</div>
 					<div class="col-md-8 col-xs-12">
-						<span class="esh-pager-item">Showing ${items.current} of ${items.total} products - Page ${pages.current} - ${pages.total}</span>
+						<span class="esh-pager-item">Showing {items.current} of {items.total} products - Page {pages.current} - {pages.total}</span>
 					</div>
 					<div class="col-md-2 col-xs-12">
-						<a class="esh-pager-item-right esh-pager-item--navigable esh-pager-item ${next.enabledClass}" id="Next" aria-label="Next" href="${next.uri}">Next</a>
+						<a class="esh-pager-item-right esh-pager-item--navigable esh-pager-item {next.enabledClass}" id="Next" aria-label="Next" href="{next.uri}">Next</a>
 					</div>
 				</nav>
 			</article>

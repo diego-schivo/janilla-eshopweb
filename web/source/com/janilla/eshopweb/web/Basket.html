@@ -4,8 +4,8 @@
 	</div>
 </section>
 <div class="container">
-	<!--${empty}-->
-	<!--${form}-->
+	<{empty}>
+	<{form}>
 </div>
 
 <template id="Basket-Empty">
@@ -26,7 +26,7 @@
 			<section class="esh-basket-title col-xs-2">Cost</section>
 		</article>
 		<div class="esh-catalog-items row">
-			<!--${items}-->
+			<{items}>
 			<div class="container">
 				<article class="esh-basket-titles esh-basket-titles--clean row">
 					<section class="esh-basket-title col-xs-10"></section>
@@ -34,7 +34,7 @@
 				</article>
 				<article class="esh-basket-items row">
 					<section class="esh-basket-item col-xs-10"></section>
-					<section class="esh-basket-item esh-basket-item--mark col-xs-2">$ ${total}</section>
+					<section class="esh-basket-item esh-basket-item--mark col-xs-2">$ {total}</section>
 				</article>
 				<article class="esh-basket-items row">
 					<section class="esh-basket-item col-xs-7"></section>
@@ -57,15 +57,15 @@
 	<article class="esh-basket-items row">
 		<div>
 			<section class="esh-basket-item esh-basket-item--middle col-lg-3 hidden-lg-down">
-				<img class="esh-basket-image" src="${catalogItem.pictureUri}" />
+				<img class="esh-basket-image" src="{catalogItem.pictureUri}" />
 			</section>
-			<section class="esh-basket-item esh-basket-item--middle col-xs-3">${catalogItem.name}</section>
-			<section class="esh-basket-item esh-basket-item--middle col-xs-2">$ ${basketItem.unitPrice}</section>
+			<section class="esh-basket-item esh-basket-item--middle col-xs-3">{catalogItem.name}</section>
+			<section class="esh-basket-item esh-basket-item--middle col-xs-2">$ {basketItem.unitPrice}</section>
 			<section class="esh-basket-item esh-basket-item--middle col-xs-2">
-				<input type="hidden" name="items[${index}].basketItem.id" value="${basketItem.id}" />
-				<input type="number" class="esh-basket-input" min="0" name="items[${index}].basketItem.quantity" value="${basketItem.quantity}" />
+				<input type="hidden" name="items[{index}].basketItem.id" value="{basketItem.id}" />
+				<input type="number" class="esh-basket-input" min="0" name="items[{index}].basketItem.quantity" value="{basketItem.quantity}" />
 			</section>
-			<section class="esh-basket-item esh-basket-item--middle esh-basket-item--mark col-xs-2">$ ${price}</section>
+			<section class="esh-basket-item esh-basket-item--middle esh-basket-item--mark col-xs-2">$ {price}</section>
 		</div>
 		<div class="row"></div>
 	</article>

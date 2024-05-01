@@ -41,7 +41,7 @@ public class ApplicationUser {
 
 	public static Random RANDOM = new SecureRandom();
 
-	public static void setHashAndSalt(ApplicationUser user, String password) {
+	public static ApplicationUser setHashAndSalt(ApplicationUser user, String password) {
 		var p = password.toCharArray();
 		var s = new byte[16];
 		RANDOM.nextBytes(s);
@@ -49,6 +49,7 @@ public class ApplicationUser {
 		var f = HexFormat.of();
 		user.setPasswordHash(f.formatHex(h));
 		user.setSalt(f.formatHex(s));
+		return user;
 	}
 
 	public static boolean testPassword(String password, ApplicationUser user) {

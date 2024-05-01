@@ -8,9 +8,9 @@
 				<section class="esh-orders-detail-title col-xs-3">Status</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-3">${order.id}</section>
-				<section class="esh-orders-detail-item col-xs-3">${order.orderDate}</section>
-				<section class="esh-orders-detail-item col-xs-2">$ ${total}</section>
+				<section class="esh-orders-detail-item col-xs-3">{order.id}</section>
+				<section class="esh-orders-detail-item col-xs-3">{order.orderDate}</section>
+				<section class="esh-orders-detail-item col-xs-2">$ {total}</section>
 				<section class="esh-orders-detail-item col-xs-3">Pending</section>
 			</article>
 		</section>
@@ -19,20 +19,20 @@
 				<section class="esh-orders-detail-title col-xs-12">Shipping Address</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.street}</section>
+				<section class="esh-orders-detail-item col-xs-12">{order.shipToAddress.street}</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.city}</section>
+				<section class="esh-orders-detail-item col-xs-12">{order.shipToAddress.city}</section>
 			</article>
 			<article class="esh-orders-detail-items row">
-				<section class="esh-orders-detail-item col-xs-12">${order.shipToAddress.country}</section>
+				<section class="esh-orders-detail-item col-xs-12">{order.shipToAddress.country}</section>
 			</article>
 		</section>
 		<section class="esh-orders-detail-section">
 			<article class="esh-orders-detail-titles row">
 				<section class="esh-orders-detail-title col-xs-12">ORDER DETAILS</section>
 			</article>
-			<!--${items}-->
+			<{items}>
 		</section>
 		<section class="esh-orders-detail-section esh-orders-detail-section--right">
 			<article class="esh-orders-detail-titles esh-basket-titles--clean row">
@@ -50,11 +50,11 @@
 <template id="Order-Detail-Item">
 	<article class="esh-orders-detail-items esh-orders-detail-items--border row">
 		<section class="esh-orders-detail-item col-md-4 hidden-md-down">
-			<img class="esh-orders-detail-image" src="${item.itemOrdered.pictureUri}">
+			<img class="esh-orders-detail-image" src="{item.itemOrdered.pictureUri}">
 		</section>
-		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-3">${item.itemOrdered.productName}</section>
-		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-1">$ ${item.unitPrice}</section>
-		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-1">${item.units}</section>
-		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-2">$ ${total}</section>
+		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-3">{item.itemOrdered.productName}</section>
+		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-1">$ {item.unitPrice}</section>
+		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-1">{item.units}</section>
+		<section class="esh-orders-detail-item esh-orders-detail-item--middle col-xs-2">$ {total}</section>
 	</article>
 </template>

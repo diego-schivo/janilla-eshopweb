@@ -1,8 +1,8 @@
 <h4>Two-factor authentication</h4>
-<!--${manage}-->
+<{manage}>
 <h5>Authenticator app</h5>
-<!--${appCreate}-->
-<!--${appUpdate}-->
+<{appCreate}>
+<{appUpdate}>
 
 <template id="Authenticator-AppCreate">
 	<a class="btn btn-default" href="/account/authenticator/enable">Add authenticator app</a>
@@ -51,11 +51,11 @@
 			<li>
 				<p>
 					Scan the QR Code or enter this key
-					<kbd>${sharedKey}</kbd> into your two factor authenticator app.
+					<kbd>{sharedKey}</kbd> into your two factor authenticator app.
 					Spaces and casing do not matter.
 				</p>
 				<div id="qrCode"></div>
-				<div id="qrCodeData" data-url="${qrCode}"></div>
+				<div id="qrCodeData" data-url="{qrCode}"></div>
 			</li>
 			<li>
 				<p>
@@ -106,7 +106,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<!--${codeStream}-->
+			<{codeStream}>
 		</div>
 	</div>
 </template>

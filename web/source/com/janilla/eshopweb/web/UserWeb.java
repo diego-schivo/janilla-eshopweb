@@ -196,8 +196,10 @@ public class UserWeb {
 			var s = f.parseHex(u.getSalt());
 			var h = f.formatHex(ApplicationUser.hash(form.code.toCharArray(), s));
 			if (u.getTwoFactor().recoveryCodeHashes().remove(h))
-				persistence.getCrud(ApplicationUser.class)
-						.update(u.getId(), x -> x.setTwoFactor(u.getTwoFactor()));
+				persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+					x.setTwoFactor(u.getTwoFactor());
+					return x;
+				});
 			else
 				v.set(null, "Invalid login attempt.");
 		}

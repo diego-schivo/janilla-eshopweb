@@ -24,7 +24,6 @@
 package com.janilla.eshopweb.web;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -51,13 +50,9 @@ public class OrderWeb {
 		var c = persistence.getCrud(Order.class);
 		var d = persistence.getCrud(OrderItem.class);
 		var i = c.read(c.filter("buyer", u.getUserName())).map(o -> {
-			try {
-				var t = d.read(d.filter("order", o.getId())).reduce(BigDecimal.ZERO,
-						(a, b) -> a.add(b.getUnitPrice().multiply(BigDecimal.valueOf(b.getUnits()))), (a, b) -> a);
-				return new History.Item(o, t);
-			} catch (IOException f) {
-				throw new UncheckedIOException(f);
-			}
+			var t = d.read(d.filter("order", o.getId())).reduce(BigDecimal.ZERO,
+					(a, b) -> a.add(b.getUnitPrice().multiply(BigDecimal.valueOf(b.getUnits()))), (a, b) -> a);
+			return new History.Item(o, t);
 		}).toList();
 		return new History(i);
 	}

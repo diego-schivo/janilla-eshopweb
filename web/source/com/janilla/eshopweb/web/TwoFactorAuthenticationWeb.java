@@ -89,7 +89,10 @@ public class TwoFactorAuthenticationWeb {
 			return getEnable(exchange);
 
 		u.setTwoFactor(u.getTwoFactor().withEnabled(true));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> x.setTwoFactor(u.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+			x.setTwoFactor(u.getTwoFactor());
+			return x;
+		});
 
 		var t = getJwt(u.getEmail(), true);
 		e.addUserCookie(t);
@@ -113,7 +116,10 @@ public class TwoFactorAuthenticationWeb {
 		if (!u.getTwoFactor().enabled())
 			throw new RuntimeException();
 		u.setTwoFactor(new ApplicationUser.TwoFactor(false, u.getTwoFactor().secretKey(), null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> x.setTwoFactor(u.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+			x.setTwoFactor(u.getTwoFactor());
+			return x;
+		});
 		return URI.create("/account/authenticator");
 	}
 
@@ -143,7 +149,10 @@ public class TwoFactorAuthenticationWeb {
 		if (u.getTwoFactor().secretKey() == null)
 			throw new RuntimeException();
 		u.setTwoFactor(new ApplicationUser.TwoFactor(false, null, null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> x.setTwoFactor(u.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+			x.setTwoFactor(u.getTwoFactor());
+			return x;
+		});
 		return URI.create("/account/authenticator/enable");
 	}
 
@@ -163,7 +172,10 @@ public class TwoFactorAuthenticationWeb {
 		if (u.getTwoFactor().recoveryCodeHashes() == null)
 			throw new RuntimeException();
 		u.setTwoFactor(u.getTwoFactor().withRecoveryCodeHashes(null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> x.setTwoFactor(u.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+			x.setTwoFactor(u.getTwoFactor());
+			return x;
+		});
 		return URI.create("/account/authenticator/recovery");
 	}
 
@@ -171,7 +183,10 @@ public class TwoFactorAuthenticationWeb {
 		var b = new byte[20];
 		ApplicationUser.RANDOM.nextBytes(b);
 		user.setTwoFactor(user.getTwoFactor().withSecretKey(Base32.encode(b)));
-		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> x.setTwoFactor(user.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> {
+			x.setTwoFactor(user.getTwoFactor());
+			return x;
+		});
 	}
 
 	protected List<String> setRecoveryCodes(ApplicationUser user) throws IOException {
@@ -187,7 +202,10 @@ public class TwoFactorAuthenticationWeb {
 		var s = f.parseHex(user.getSalt());
 		var h = c.stream().map(x -> f.formatHex(ApplicationUser.hash(x.toCharArray(), s))).collect(Collectors.toSet());
 		user.setTwoFactor(user.getTwoFactor().withRecoveryCodeHashes(h));
-		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> x.setTwoFactor(user.getTwoFactor()));
+		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> {
+			x.setTwoFactor(user.getTwoFactor());
+			return x;
+		});
 		return c;
 	}
 
@@ -280,7 +298,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 
 		@Render(template = """
-				<code>${value}</code>${delimiter}
+				<code>{value}</code>{delimiter}
 				""")
 		public record Code(int index, String value) {
 

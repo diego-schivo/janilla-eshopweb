@@ -23,25 +23,25 @@
 				</tr>
 			</thead>
 			<tbody class="cursor-pointer">
-				<!--${catalogItems}-->
+				<{catalogItems}>
 			</tbody>
 		</table>
-		<!--${details}-->
-		<!--${edit}-->
-		<!--${create}-->
-		<!--${delete}-->
+		<{details}>
+		<{edit}>
+		<{create}>
+		<{delete}>
 	</div>
 </template>
 
 <template id="CatalogItem">
 	<tr>
-		<td><img class="img-thumbnail" src="${item.pictureUri}"></td>
-		<td>${item.catalogType}</td>
-		<td>${item.catalogBrand}</td>
-		<td>${item.id}</td>
-		<td>${item.name}</td>
-		<td>${item.description}</td>
-		<td>${item.price}</td>
+		<td><img class="img-thumbnail" src="{item.pictureUri}"></td>
+		<td>{item.catalogType}</td>
+		<td>{item.catalogBrand}</td>
+		<td>{item.id}</td>
+		<td>{item.name}</td>
+		<td>{item.description}</td>
+		<td>{item.price}</td>
 		<td>
 			<button class="btn btn-primary">Edit</button>
 			<button class="btn btn-danger">Delete</button>
