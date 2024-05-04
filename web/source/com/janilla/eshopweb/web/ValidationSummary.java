@@ -28,8 +28,8 @@ import java.util.Map.Entry;
 
 import com.janilla.web.Render;
 
-@Render(template = "ValidationSummary.html")
-public class ValidationSummary implements Iterable<@Render(template = "<li>{}</li>\n") String> {
+@Render("ValidationSummary.html")
+public class ValidationSummary implements Iterable<@Render("<li>{}</li>\n") String> {
 
 	protected ValidationMessages validationMessages;
 

@@ -111,7 +111,7 @@ public class BasketWeb {
 		return URI.create("/basket");
 	}
 
-	@Render(template = "Basket.html")
+	@Render("Basket.html")
 	public record BasketPage(List<Item> items) implements Page {
 
 		@Override
@@ -128,11 +128,11 @@ public class BasketWeb {
 		}
 	}
 
-	@Render(template = "Basket-Empty.html")
+	@Render("Basket-Empty.html")
 	public record Empty() {
 	}
 
-	@Render(template = "Basket-Form.html")
+	@Render("Basket-Form.html")
 	public record Form(List<Item> items) {
 
 		public BigDecimal total() {
@@ -140,7 +140,7 @@ public class BasketWeb {
 		}
 	}
 
-	@Render(template = "Basket-Item.html")
+	@Render("Basket-Item.html")
 	public record Item(int index, BasketItem basketItem, CatalogItem catalogItem) {
 
 		public BigDecimal price() {

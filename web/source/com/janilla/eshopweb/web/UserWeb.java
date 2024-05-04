@@ -332,7 +332,7 @@ public class UserWeb {
 		}
 	}
 
-	@Render(template = "Login.html")
+	@Render("Login.html")
 	public record Login(Form form, ValidationMessages validationMessages) implements Page, ValidationView {
 
 		@Override
@@ -344,7 +344,7 @@ public class UserWeb {
 		}
 	}
 
-	@Render(template = "Login-TwoFactor.html")
+	@Render("Login-TwoFactor.html")
 	public record TwoFactor(Form form, ValidationMessages validationMessages) implements Page, ValidationView {
 
 		@Override
@@ -356,7 +356,7 @@ public class UserWeb {
 		}
 	}
 
-	@Render(template = "Login-Recovery.html")
+	@Render("Login-Recovery.html")
 	public record Recovery(Form form, ValidationMessages validationMessages) implements Page, ValidationView {
 
 		@Override
@@ -375,7 +375,7 @@ public class UserWeb {
 //	public record Claim(URI type, String value) {
 //	}
 
-	@Render(template = "ResetPassword.html")
+	@Render("ResetPassword.html")
 	public record ResetPassword(Form form, ValidationMessages validationMessages) implements Page, ValidationView {
 
 		@Override
@@ -386,7 +386,7 @@ public class UserWeb {
 		public record Form(String email) {
 		}
 
-		@Render(template = "ResetPassword-Confirmation.html")
+		@Render("ResetPassword-Confirmation.html")
 		public record Confirmation() implements Page {
 
 			@Override
@@ -396,7 +396,7 @@ public class UserWeb {
 		}
 	}
 
-	@Render(template = "Register.html")
+	@Render("Register.html")
 	public record Register(Form form, ValidationMessages validationMessages) implements Page, ValidationView {
 
 		@Override

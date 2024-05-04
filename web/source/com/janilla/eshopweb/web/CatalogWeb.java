@@ -76,8 +76,8 @@ public class CatalogWeb {
 		return new Catalog(f, q, i);
 	}
 
-	@Render(template = "Catalog.html")
-	public record Catalog(Filters filters, Pager pager, List<@Render(template = "CatalogItem.html") CatalogItem> items)
+	@Render("Catalog.html")
+	public record Catalog(Filters filters, Pager pager, List<@Render("CatalogItem.html") CatalogItem> items)
 			implements Page {
 
 		@Override
@@ -86,11 +86,11 @@ public class CatalogWeb {
 		}
 	}
 
-	@Render(template = "Catalog-Filters.html")
+	@Render("Catalog-Filters.html")
 	public record Filters(List<Option> brandOptions, List<Option> typeOptions) {
 	}
 
-	@Render(template = """
+	@Render("""
 			<option value="{value}" data-{selectedAttribute}>{text}</option>
 			""")
 	public record Option(String value, String text, boolean selected) {
@@ -100,7 +100,7 @@ public class CatalogWeb {
 		}
 	}
 
-	@Render(template = "Catalog-Pager.html")
+	@Render("Catalog-Pager.html")
 	public record Pager(CurrentAndTotal items, CurrentAndTotal pages, PageAndEnabled previous, PageAndEnabled next) {
 	}
 

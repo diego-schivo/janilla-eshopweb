@@ -30,7 +30,10 @@ import java.util.function.Supplier;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.reflect.Factory;
+import com.janilla.reflect.Reflection;
 import com.janilla.util.Lazy;
+import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 
 public class EShopAdminApp {
@@ -52,9 +55,22 @@ public class EShopAdminApp {
 
 	private Properties configuration;
 
+	private Supplier<Factory> factory = Lazy.of(() -> {
+		var f = new Factory();
+		f.setTypes(
+				Util.getPackageClasses(getClass().getPackageName()).toList());
+		f.setEnclosing(this);
+		return f;
+	});
+
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new ApplicationHandlerBuilder();
-		b.setApplication(this);
+//		var b = new ApplicationHandlerBuilder();
+//		b.setApplication(this);
+		var f = getFactory();
+		var b = f.newInstance(ApplicationHandlerBuilder.class);
+		var p = Reflection.property(b.getClass(), "application");
+		if (p != null)
+			p.set(b, f.getEnclosing());
 		return b.build();
 	});
 
@@ -64,6 +80,10 @@ public class EShopAdminApp {
 
 	public void setConfiguration(Properties configuration) {
 		this.configuration = configuration;
+	}
+
+	public Factory getFactory() {
+		return factory.get();
 	}
 
 	public IO.Consumer<HttpExchange> getHandler() {

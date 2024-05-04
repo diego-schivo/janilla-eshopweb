@@ -26,7 +26,7 @@ package com.janilla.eshopweb.web;
 import com.janilla.util.EntryList;
 import com.janilla.web.Render;
 
-public class ValidationMessages extends EntryList<String, @Render(template = "ValidationMessage.html") String> {
+public class ValidationMessages extends EntryList<String, @Render("ValidationMessage.html") String> {
 
 	private static final long serialVersionUID = 7374022162620715282L;
 }

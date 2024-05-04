@@ -230,7 +230,7 @@ public class TwoFactorAuthenticationWeb {
 		return Jwt.generateToken(h, p, configuration.getProperty("eshopweb.jwt.key"));
 	}
 
-	@Render(template = "Authenticator.html")
+	@Render("Authenticator.html")
 	public record Authenticator(ApplicationUser user) implements Page {
 
 		@Override
@@ -250,20 +250,20 @@ public class TwoFactorAuthenticationWeb {
 			return user.getTwoFactor().secretKey() != null ? new AppUpdate() : null;
 		}
 
-		@Render(template = "Authenticator-Manage.html")
+		@Render("Authenticator-Manage.html")
 		public record Manage() {
 		}
 
-		@Render(template = "Authenticator-AppCreate.html")
+		@Render("Authenticator-AppCreate.html")
 		public record AppCreate() {
 		}
 
-		@Render(template = "Authenticator-AppUpdate.html")
+		@Render("Authenticator-AppUpdate.html")
 		public record AppUpdate() {
 		}
 	}
 
-	@Render(template = "Authenticator-Enable.html")
+	@Render("Authenticator-Enable.html")
 	public record Enable(String sharedKey, URI qrCode) implements Page {
 
 		@Override
@@ -275,7 +275,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 	}
 
-	@Render(template = "Authenticator-Disable.html")
+	@Render("Authenticator-Disable.html")
 	public record Disable() implements Page {
 
 		@Override
@@ -284,7 +284,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 	}
 
-	@Render(template = "Authenticator-Recovery.html")
+	@Render("Authenticator-Recovery.html")
 	public record Recovery(List<String> codes) implements Page {
 
 		@Override
@@ -297,7 +297,7 @@ public class TwoFactorAuthenticationWeb {
 			return codes.stream().map(x -> new Code(i[0]++, x));
 		}
 
-		@Render(template = """
+		@Render("""
 				<code>{value}</code>{delimiter}
 				""")
 		public record Code(int index, String value) {
@@ -308,7 +308,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 	}
 
-	@Render(template = "Authenticator-Reset.html")
+	@Render("Authenticator-Reset.html")
 	public record Reset() implements Page {
 
 		@Override
@@ -317,7 +317,7 @@ public class TwoFactorAuthenticationWeb {
 		}
 	}
 
-	@Render(template = "Authenticator-RecoveryReset.html")
+	@Render("Authenticator-RecoveryReset.html")
 	public record RecoveryReset() implements Page {
 
 		@Override

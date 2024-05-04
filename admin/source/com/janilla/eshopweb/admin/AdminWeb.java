@@ -48,11 +48,11 @@ public class AdminWeb {
 //		return new Script(u);
 //	}
 
-	@Render(template = "Admin.html")
+	@Render("Admin.html")
 	public record Admin(String apiUrl) {
 	}
 
-//	@Render(template = "admin.js")
+//	@Render("admin.js")
 //	public record Script(String apiUrl) {
 //	}
 }

@@ -76,7 +76,7 @@ public class OrderWeb {
 		return new Detail(o, t, j);
 	}
 
-	@Render(template = "Order-History.html")
+	@Render("Order-History.html")
 	public record History(List<Item> items) implements Page {
 
 		@Override
@@ -84,12 +84,12 @@ public class OrderWeb {
 			return "My Order History";
 		}
 
-		@Render(template = "Order-History-Item.html")
+		@Render("Order-History-Item.html")
 		public record Item(Order order, BigDecimal total) {
 		}
 	}
 
-	@Render(template = "Order-Detail.html")
+	@Render("Order-Detail.html")
 	public record Detail(Order order, BigDecimal total, List<Item> items) implements Page {
 
 		@Override
@@ -97,7 +97,7 @@ public class OrderWeb {
 			return "Order Detail";
 		}
 
-		@Render(template = "Order-Detail-Item.html")
+		@Render("Order-Detail-Item.html")
 		public record Item(OrderItem item, BigDecimal total) {
 		}
 	}

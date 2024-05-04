@@ -108,7 +108,7 @@ public class CheckoutWeb {
 		return new Success();
 	}
 
-	@Render(template = "Checkout.html")
+	@Render("Checkout.html")
 	public record Checkout(List<Item> items) implements Page {
 
 		@Override
@@ -125,11 +125,11 @@ public class CheckoutWeb {
 		}
 	}
 
-	@Render(template = "Checkout-Empty.html")
+	@Render("Checkout-Empty.html")
 	public record Empty() {
 	}
 
-	@Render(template = "Checkout-Form.html")
+	@Render("Checkout-Form.html")
 	public record Form(List<Item> items) {
 
 		public BigDecimal total() {
@@ -137,7 +137,7 @@ public class CheckoutWeb {
 		}
 	}
 
-	@Render(template = "Checkout-Item.html")
+	@Render("Checkout-Item.html")
 	public record Item(BasketItem basketItem, CatalogItem catalogItem) {
 
 		public BigDecimal price() {
@@ -145,7 +145,7 @@ public class CheckoutWeb {
 		}
 	}
 
-	@Render(template = "Checkout-Success.html")
+	@Render("Checkout-Success.html")
 	public record Success() implements Page {
 
 		@Override

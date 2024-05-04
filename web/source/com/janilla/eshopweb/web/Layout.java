@@ -35,8 +35,8 @@ import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.html") int basket, Page page)
+@Render("Layout.html")
+public record Layout(ApplicationUser user, @Render("Layout-Basket.html") int basket, Page page)
 		implements Renderer {
 
 	public Login login() {
@@ -67,11 +67,11 @@ public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.htm
 		});
 	}
 
-	@Render(template = "Layout-Login.html")
+	@Render("Layout-Login.html")
 	public record Login() {
 	}
 
-	@Render(template = "Layout-Form.html")
+	@Render("Layout-Form.html")
 	public record Form(ApplicationUser user) {
 
 		public Admin admin() {
@@ -79,7 +79,7 @@ public record Layout(ApplicationUser user, @Render(template = "Layout-Basket.htm
 			return r != null && r.contains("Administrators") ? new Admin() : null;
 		}
 
-		@Render(template = "Layout-Form-Admin.html")
+		@Render("Layout-Form-Admin.html")
 		public record Admin() {
 		}
 	}

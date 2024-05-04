@@ -118,7 +118,7 @@ public class AccountWeb {
 		return URI.create("/manage/change-password");
 	}
 
-	@Render(template = "Account.html")
+	@Render("Account.html")
 	public record Account(Page page) implements Page {
 
 		public List<NavItem> navItems() {
@@ -133,7 +133,7 @@ public class AccountWeb {
 			return page.title();
 		}
 
-		@Render(template = "Account-NavItem.html")
+		@Render("Account-NavItem.html")
 		public record NavItem(URI uri, String text, boolean current) {
 
 			public String activeClass() {
@@ -142,9 +142,9 @@ public class AccountWeb {
 		}
 	}
 
-	@Render(template = "Profile.html")
-	public record Profile(@Render(template = "StatusMessage.html") String statusMessage, ApplicationUser user,
-			EntryList<String, @Render(template = "ValidationMessage.html") String> validationMessages) implements Page {
+	@Render("Profile.html")
+	public record Profile(@Render("StatusMessage.html") String statusMessage, ApplicationUser user,
+			EntryList<String, @Render("ValidationMessage.html") String> validationMessages) implements Page {
 
 		static Map<Long, String> statusMessages = new ConcurrentHashMap<>();
 
@@ -153,8 +153,8 @@ public class AccountWeb {
 			return "Profile";
 		}
 
-		@Render(template = "ValidationSummary.html")
-		public Stream<@Render(template = """
+		@Render("ValidationSummary.html")
+		public Stream<@Render("""
 				<li>{}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()
@@ -163,9 +163,9 @@ public class AccountWeb {
 		}
 	}
 
-	@Render(template = "Password.html")
-	public record Password(@Render(template = "StatusMessage.html") String statusMessage, Form form,
-			EntryList<String, @Render(template = "ValidationMessage.html") String> validationMessages) implements Page {
+	@Render("Password.html")
+	public record Password(@Render("StatusMessage.html") String statusMessage, Form form,
+			EntryList<String, @Render("ValidationMessage.html") String> validationMessages) implements Page {
 
 		static Map<Long, String> statusMessages = new ConcurrentHashMap<>();
 
@@ -174,8 +174,8 @@ public class AccountWeb {
 			return "Change password";
 		}
 
-		@Render(template = "ValidationSummary.html")
-		public Stream<@Render(template = """
+		@Render("ValidationSummary.html")
+		public Stream<@Render("""
 				<li>{}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()

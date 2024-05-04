@@ -28,14 +28,18 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
-import com.janilla.eshopweb.core.CustomPersistenceBuilder;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
+import com.janilla.util.Util;
+import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.NotFoundException;
 
 public class EShopWebApp {
@@ -58,9 +62,19 @@ public class EShopWebApp {
 
 	private Properties configuration;
 
+	private Supplier<Factory> factory = Lazy.of(() -> {
+		var f = new Factory();
+		f.setTypes(Stream.concat(Util.getPackageClasses("com.janilla.eshopweb.core"),
+				Util.getPackageClasses(getClass().getPackageName())).toList());
+		f.setEnclosing(this);
+		return f;
+	});
+
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomPersistenceBuilder();
-		b.setApplication(this);
+//		var b = new CustomPersistenceBuilder();
+//		b.setApplication(this);
+		var f = getFactory();
+		var b = f.newInstance(ApplicationPersistenceBuilder.class);
 		return b.build();
 	});
 
@@ -73,8 +87,10 @@ public class EShopWebApp {
 	static ThreadLocal<IO.Consumer<HttpExchange>> currentHandler = new ThreadLocal<>();
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new CustomApplicationHandlerBuilder();
-		b.setApplication(this);
+//		var b = new CustomApplicationHandlerBuilder();
+//		b.setApplication(this);
+		var f1 = getFactory();
+		var b = f1.newInstance(ApplicationHandlerBuilder.class);
 		var hh = List.of(getAdmin().getHandler(), b.build());
 		return e -> {
 			try {
@@ -117,6 +133,10 @@ public class EShopWebApp {
 
 	public void setConfiguration(Properties configuration) {
 		this.configuration = configuration;
+	}
+
+	public Factory getFactory() {
+		return factory.get();
 	}
 
 	public Persistence getPersistence() {

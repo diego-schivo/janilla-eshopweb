@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
@@ -40,7 +39,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 	@Override
 	public Persistence build() {
 		if (file == null) {
-			var c = (Properties) Reflection.property(application.getClass(), "configuration").get(application);
+			var a = factory.getEnclosing();
+			var c = (Properties) Reflection.property(a.getClass(), "configuration").get(a);
 			var p = c.getProperty("eshopweb.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
@@ -118,8 +118,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		return p;
 	}
 
-	@Override
-	protected Stream<String> getPackageNames() {
-		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.eshopweb.core"));
-	}
+//	@Override
+//	protected Stream<String> getPackageNames() {
+//		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.eshopweb.core"));
+//	}
 }
