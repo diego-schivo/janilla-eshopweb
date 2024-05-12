@@ -46,8 +46,8 @@ public class CatalogWeb {
 	}
 
 	@Handle(method = "GET", path = "/")
-	public Catalog getCatalog(@Parameter(name = "brand") long brand, @Parameter(name = "type") long type,
-			@Parameter(name = "page") int page) throws IOException {
+	public Catalog getCatalog(@Parameter("brand") long brand, @Parameter("type") long type,
+			@Parameter("page") int page) throws IOException {
 		var c1 = persistence.getCrud(CatalogBrand.class);
 		var b = Stream
 				.concat(Stream.of(new Option(null, "All", false)),

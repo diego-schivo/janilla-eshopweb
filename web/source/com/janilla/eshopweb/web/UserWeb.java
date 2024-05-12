@@ -91,7 +91,7 @@ public class UserWeb {
 	static Pattern emailPattern = Pattern.compile("\\S+@\\S+\\.\\S+");
 
 	@Handle(method = "POST", path = "/user/login")
-	public Object authenticate(Login.Form form, @Parameter(name = "returnUrl") URI returnURI,
+	public Object authenticate(Login.Form form, @Parameter("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
@@ -144,7 +144,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/login/two-factor")
-	public Object authenticate(TwoFactor.Form form, @Parameter(name = "returnUrl") URI returnURI,
+	public Object authenticate(TwoFactor.Form form, @Parameter("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
@@ -184,7 +184,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/login/recovery")
-	public Object authenticate(Recovery.Form form, @Parameter(name = "returnUrl") URI returnURI,
+	public Object authenticate(Recovery.Form form, @Parameter("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())

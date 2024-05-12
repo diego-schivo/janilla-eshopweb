@@ -67,7 +67,7 @@ public class BasketWeb {
 	}
 
 	@Handle(method = "POST", path = "/basket")
-	public URI addItem(@Parameter(name = "id") long id, HttpExchange exchange) throws IOException {
+	public URI addItem(@Parameter("id") long id, HttpExchange exchange) throws IOException {
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
 		var ii = persistence.getCrud(BasketItem.class).filter("basket", b.getId());
 		var i = persistence.getCrud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
