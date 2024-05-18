@@ -33,8 +33,8 @@ import com.janilla.eshopweb.core.CatalogBrand;
 import com.janilla.eshopweb.core.CatalogItem;
 import com.janilla.eshopweb.core.CatalogType;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class CatalogWeb {
@@ -46,8 +46,8 @@ public class CatalogWeb {
 	}
 
 	@Handle(method = "GET", path = "/")
-	public Catalog getCatalog(@Parameter("brand") long brand, @Parameter("type") long type,
-			@Parameter("page") int page) throws IOException {
+	public Catalog getCatalog(@Bind("brand") long brand, @Bind("type") long type,
+			@Bind("page") int page) throws IOException {
 		var c1 = persistence.getCrud(CatalogBrand.class);
 		var b = Stream
 				.concat(Stream.of(new Option(null, "All", false)),

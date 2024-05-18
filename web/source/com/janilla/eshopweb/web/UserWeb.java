@@ -38,12 +38,12 @@ import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.json.Jwt;
 import com.janilla.net.Net;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Parameter;
 import com.janilla.reflect.Reflection;
 import com.janilla.util.Base32;
 import com.janilla.util.EntryList;
 import com.janilla.util.Totp;
 import com.janilla.web.Handle;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class UserWeb {
@@ -91,7 +91,7 @@ public class UserWeb {
 	static Pattern emailPattern = Pattern.compile("\\S+@\\S+\\.\\S+");
 
 	@Handle(method = "POST", path = "/user/login")
-	public Object authenticate(Login.Form form, @Parameter("returnUrl") URI returnURI,
+	public Object authenticate(Login.Form form, @Bind("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
@@ -144,7 +144,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/login/two-factor")
-	public Object authenticate(TwoFactor.Form form, @Parameter("returnUrl") URI returnURI,
+	public Object authenticate(TwoFactor.Form form, @Bind("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
@@ -184,7 +184,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/login/recovery")
-	public Object authenticate(Recovery.Form form, @Parameter("returnUrl") URI returnURI,
+	public Object authenticate(Recovery.Form form, @Bind("returnUrl") URI returnURI,
 			EShopWebApp.Exchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())

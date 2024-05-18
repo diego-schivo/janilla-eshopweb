@@ -34,8 +34,8 @@ import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.eshopweb.core.CatalogItem;
 import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class BasketWeb {
@@ -67,7 +67,7 @@ public class BasketWeb {
 	}
 
 	@Handle(method = "POST", path = "/basket")
-	public URI addItem(@Parameter("id") long id, HttpExchange exchange) throws IOException {
+	public URI addItem(@Bind("id") long id, HttpExchange exchange) throws IOException {
 		var b = ((CustomHttpExchange) exchange).getBasket(true);
 		var ii = persistence.getCrud(BasketItem.class).filter("basket", b.getId());
 		var i = persistence.getCrud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
