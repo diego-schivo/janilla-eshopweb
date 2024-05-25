@@ -54,9 +54,9 @@ public class BasketWeb {
 
 	@Handle(method = "GET", path = "/basket")
 	public BasketPage getBasket(HttpExchange exchange) throws IOException {
-		var b = ((CustomHttpExchange) exchange).getBasket(true);
-		var c1 = persistence.getCrud(BasketItem.class);
-		var c2 = persistence.getCrud(CatalogItem.class);
+		var b = ((CustomExchange) exchange).getBasket(true);
+		var c1 = persistence.crud(BasketItem.class);
+		var c2 = persistence.crud(CatalogItem.class);
 		var i = new ArrayList<Item>();
 		for (var j = c1.read(c1.filter("basket", b.getId())).iterator(); j.hasNext();) {
 			var i1 = j.next();
@@ -68,25 +68,25 @@ public class BasketWeb {
 
 	@Handle(method = "POST", path = "/basket")
 	public URI addItem(@Bind("id") long id, HttpExchange exchange) throws IOException {
-		var b = ((CustomHttpExchange) exchange).getBasket(true);
-		var ii = persistence.getCrud(BasketItem.class).filter("basket", b.getId());
-		var i = persistence.getCrud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
+		var b = ((CustomExchange) exchange).getBasket(true);
+		var ii = persistence.crud(BasketItem.class).filter("basket", b.getId());
+		var i = persistence.crud(BasketItem.class).read(ii).filter(x -> x.getCatalogItem() == id).findFirst()
 				.orElse(null);
 		if (i != null)
-			persistence.getCrud(BasketItem.class).update(i.getId(), x -> {
+			persistence.crud(BasketItem.class).update(i.getId(), x -> {
 				x.setQuantity(x.getQuantity() + 1);
 				return x;
 			});
 		else {
 			if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo")) && ii.length >= 10)
 				throw new MethodBlockedException();
-			var j = persistence.getCrud(CatalogItem.class).read(id);
+			var j = persistence.crud(CatalogItem.class).read(id);
 			i = new BasketItem();
 			i.setCatalogItem(j.getId());
 			i.setUnitPrice(j.getPrice());
 			i.setQuantity(1);
 			i.setBasket(b.getId());
-			persistence.getCrud(BasketItem.class).create(i);
+			persistence.crud(BasketItem.class).create(i);
 		}
 
 		return URI.create("/basket");
@@ -94,8 +94,8 @@ public class BasketWeb {
 
 	@Handle(method = "POST", path = "/basket/update")
 	public URI update(BasketPage view) throws IOException {
-		var c = persistence.getCrud(BasketItem.class);
-		persistence.getDatabase().perform((ss, ii) -> {
+		var c = persistence.crud(BasketItem.class);
+		persistence.database().perform((ss, ii) -> {
 			for (var i : view.items) {
 				var q = i.basketItem.getQuantity();
 				if (q > 0)

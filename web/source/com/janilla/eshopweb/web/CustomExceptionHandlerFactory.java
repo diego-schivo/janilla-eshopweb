@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.web;
 
-import java.io.IOException;
 import java.net.URI;
 
 import com.janilla.frontend.RenderEngine;
@@ -33,19 +32,19 @@ import com.janilla.net.Net;
 import com.janilla.util.EntryList;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
-import com.janilla.web.HandlerFactory;
 import com.janilla.web.UnauthenticatedException;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	protected HandlerFactory mainFactory;
+	protected WebHandlerFactory mainFactory;
 
-	public void setMainFactory(HandlerFactory mainFactory) {
+	public void setMainFactory(WebHandlerFactory mainFactory) {
 		this.mainFactory = mainFactory;
 	}
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) throws IOException {
+	protected void handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 
 		var e = exchange.getException();
@@ -70,7 +69,7 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 		if (e instanceof Page p) {
 			var l = CustomTemplateHandlerFactory.toLayout(p, exchange);
 			var h = mainFactory.createHandler(RenderEngine.Entry.of(null, l, null), exchange);
-			h.accept(exchange);
+			h.handle(exchange);
 		}
 	}
 }

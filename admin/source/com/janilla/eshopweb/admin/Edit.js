@@ -44,39 +44,38 @@ class Edit {
 	}
 
 	get catalog() {
-		return this.engine.stack[1].target;
+		return this.engine.stack[1].value;
 	}
 
 	get layout() {
-		return this.engine.stack[0].target;
+		return this.engine.stack[0].value;
 	}
 
-	render = async e => {
-		if (engine.isRendering(this)) {
-			this.engine = e.clone();
-			return await engine.render(this, 'Edit');
-		}
-
-		if (engine.isRendering(this, 'catalogBrandOptions'))
-			return this.catalog.catalogBrands?.map(x => ({
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			o.template = 'Edit';
+		}) || await engine.match([this, 'catalogBrandOptions'], async (_, o) => {
+			o.value = this.catalog.catalogBrands?.map(x => ({
 				value: x.id,
 				text: x.name,
 				selected: x.id == this.data?.get('catalogBrand')
 			}));
-
-		if (engine.isRendering(this, 'catalogTypeOptions'))
-			return this.catalog.catalogTypes?.map(x => ({
+		}) || await engine.match([this, 'catalogTypeOptions'], async (_, o) => {
+			o.value = this.catalog.catalogTypes?.map(x => ({
 				value: x.id,
 				text: x.name,
 				selected: x.id == this.data?.get('catalogType')
 			}));
+		}) || await engine.match([this, 'selectedAttribute'], async (_, o) => {
+			o.value = engine.target.selected ? 'selected' : '';
+		}) || await engine.match([this, 'catalogBrandOptions', 'number'], async (_, o) => {
+			o.template = 'Create-option';
+		}) || await engine.match([this, 'catalogTypeOptions', 'number'], async (_, o) => {
+			o.template = 'Create-option';
+		});
 
-		if (engine.isRendering(this, 'selectedAttribute'))
-			return engine.target.selected ? 'selected' : '';
-
-		if (engine.isRendering(this, 'catalogBrandOptions', true) || engine.isRendering(this, 'catalogTypeOptions', true))
-			return await engine.render(engine.target, 'Create-option');
-
+		/*
 		switch (engine.stack.at(-2)?.key) {
 			case 'validationClasses':
 				return this.validationMessages?.hasOwnProperty(engine.key) ? 'invalid' : 'valid';
@@ -85,6 +84,7 @@ class Edit {
 			case 'validationMessages':
 				return this.validationMessages?.hasOwnProperty(engine.key) ? await engine.render(engine.target[engine.key], 'Create-validationMessage') : null;
 		}
+		*/
 	}
 
 	listen = () => {
@@ -94,7 +94,7 @@ class Edit {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.engine.render(this, 'Edit');
+		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
 

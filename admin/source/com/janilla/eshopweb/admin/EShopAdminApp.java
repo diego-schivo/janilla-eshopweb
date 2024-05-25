@@ -23,70 +23,56 @@
  */
 package com.janilla.eshopweb.admin;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
 import com.janilla.reflect.Factory;
-import com.janilla.reflect.Reflection;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.WebHandler;
 
 public class EShopAdminApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var p = new Properties();
 		try (var s = EShopAdminApp.class.getResourceAsStream("configuration.properties")) {
 			p.load(s);
 		}
 
 		var a = new EShopAdminApp();
-		a.setConfiguration(p);
+		a.configuration = p;
 
-		var s = new HttpServer();
+		var s = a.getFactory().create(HttpServer.class);
 		s.setPort(Integer.parseInt(p.getProperty("eshopweb.admin.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	private Properties configuration;
+	public Properties configuration;
 
 	private Supplier<Factory> factory = Lazy.of(() -> {
 		var f = new Factory();
-		f.setTypes(
-				Util.getPackageClasses(getClass().getPackageName()).toList());
-		f.setEnclosing(this);
+		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
+		f.setSource(this);
 		return f;
 	});
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-//		var b = new ApplicationHandlerBuilder();
-//		b.setApplication(this);
-		var f = getFactory();
-		var b = f.newInstance(ApplicationHandlerBuilder.class);
-		var p = Reflection.property(b.getClass(), "application");
-		if (p != null)
-			p.set(b, f.getEnclosing());
+	Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		return b.build();
 	});
 
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
+	public EShopAdminApp getApplication() {
+		return this;
 	}
 
 	public Factory getFactory() {
 		return factory.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
 	}
 }

@@ -32,7 +32,7 @@ public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
 	@Override
 	protected MethodHandlerFactory buildMethodHandlerFactory() {
 		var f = super.buildMethodHandlerFactory();
-		((EShopApiApp) factory.getEnclosing()).toInvocation = (AnnotationDrivenToMethodInvocation) f.getToInvocation();
+		((EShopApiApp) factory.getSource()).toInvocation = (AnnotationDrivenToMethodInvocation) f.getToInvocation();
 		return f;
 	}
 }

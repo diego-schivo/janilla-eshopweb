@@ -62,13 +62,13 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "GET", path = "/account/authenticator")
 	public Account getAuthenticator(HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 		return new Account(new Authenticator(u));
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/enable")
 	public Account getEnable(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().secretKey() == null)
 			setSecretKey(u);
@@ -80,7 +80,7 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "POST", path = "/account/authenticator/enable")
 	public Object enable(Enable.Form form, HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		var k = Base32.decode(u.getTwoFactor().secretKey());
 		var c = Totp.getCode(k);
@@ -89,7 +89,7 @@ public class TwoFactorAuthenticationWeb {
 			return getEnable(exchange);
 
 		u.setTwoFactor(u.getTwoFactor().withEnabled(true));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(u.getId(), x -> {
 			x.setTwoFactor(u.getTwoFactor());
 			return x;
 		});
@@ -102,7 +102,7 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "GET", path = "/account/authenticator/disable")
 	public Account getDisable(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (!u.getTwoFactor().enabled())
 			throw new RuntimeException();
@@ -111,12 +111,12 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "POST", path = "/account/authenticator/disable")
 	public Object disable(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (!u.getTwoFactor().enabled())
 			throw new RuntimeException();
 		u.setTwoFactor(new ApplicationUser.TwoFactor(false, u.getTwoFactor().secretKey(), null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(u.getId(), x -> {
 			x.setTwoFactor(u.getTwoFactor());
 			return x;
 		});
@@ -125,7 +125,7 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "GET", path = "/account/authenticator/recovery")
 	public Account getRecovery(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().recoveryCodeHashes() != null)
 			throw new RuntimeException();
@@ -135,7 +135,7 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "GET", path = "/account/authenticator/reset")
 	public Account getReset(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().secretKey() == null)
 			throw new RuntimeException();
@@ -144,12 +144,12 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "POST", path = "/account/authenticator/reset")
 	public Object reset(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().secretKey() == null)
 			throw new RuntimeException();
 		u.setTwoFactor(new ApplicationUser.TwoFactor(false, null, null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(u.getId(), x -> {
 			x.setTwoFactor(u.getTwoFactor());
 			return x;
 		});
@@ -158,7 +158,7 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "GET", path = "/account/authenticator/recovery/reset")
 	public Account getRecoveryReset(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().recoveryCodeHashes() == null)
 			throw new RuntimeException();
@@ -167,12 +167,12 @@ public class TwoFactorAuthenticationWeb {
 
 	@Handle(method = "POST", path = "/account/authenticator/recovery/reset")
 	public Object resetRecovery(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().recoveryCodeHashes() == null)
 			throw new RuntimeException();
 		u.setTwoFactor(u.getTwoFactor().withRecoveryCodeHashes(null));
-		persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(u.getId(), x -> {
 			x.setTwoFactor(u.getTwoFactor());
 			return x;
 		});
@@ -183,7 +183,7 @@ public class TwoFactorAuthenticationWeb {
 		var b = new byte[20];
 		ApplicationUser.RANDOM.nextBytes(b);
 		user.setTwoFactor(user.getTwoFactor().withSecretKey(Base32.encode(b)));
-		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(user.getId(), x -> {
 			x.setTwoFactor(user.getTwoFactor());
 			return x;
 		});
@@ -202,7 +202,7 @@ public class TwoFactorAuthenticationWeb {
 		var s = f.parseHex(user.getSalt());
 		var h = c.stream().map(x -> f.formatHex(ApplicationUser.hash(x.toCharArray(), s))).collect(Collectors.toSet());
 		user.setTwoFactor(user.getTwoFactor().withRecoveryCodeHashes(h));
-		persistence.getCrud(ApplicationUser.class).update(user.getId(), x -> {
+		persistence.crud(ApplicationUser.class).update(user.getId(), x -> {
 			x.setTwoFactor(user.getTwoFactor());
 			return x;
 		});

@@ -65,7 +65,7 @@ public class UserWeb {
 //	static URI ROLE_CLAIM_TYPE = URI.create("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
 
 	@Handle(method = "GET", path = "/user")
-	public Object getUser(EShopWebApp.Exchange exchange) {
+	public Object getUser(CustomExchange exchange) {
 		var u = exchange.getUser(false);
 //		System.out.println("user=" + u);
 		var t = getJwt(u.getEmail());
@@ -92,7 +92,7 @@ public class UserWeb {
 
 	@Handle(method = "POST", path = "/user/login")
 	public Object authenticate(Login.Form form, @Bind("returnUrl") URI returnURI,
-			EShopWebApp.Exchange exchange) throws IOException {
+			CustomExchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");
@@ -103,7 +103,7 @@ public class UserWeb {
 
 		ApplicationUser u = null;
 		if (v.isEmpty()) {
-			var c = persistence.getCrud(ApplicationUser.class);
+			var c = persistence.crud(ApplicationUser.class);
 			var i = c.find("email", form.email);
 			u = i > 0 ? c.read(i) : null;
 			if (u == null || !ApplicationUser.testPassword(form.password, u))
@@ -129,7 +129,7 @@ public class UserWeb {
 			return URI.create(s);
 		}
 
-		var b = ((CustomHttpExchange) exchange).getBasket(false);
+		var b = ((CustomExchange) exchange).getBasket(false);
 		if (b != null) {
 			transferBasket(b, u);
 			exchange.removeBasketCookie();
@@ -145,7 +145,7 @@ public class UserWeb {
 
 	@Handle(method = "POST", path = "/user/login/two-factor")
 	public Object authenticate(TwoFactor.Form form, @Bind("returnUrl") URI returnURI,
-			EShopWebApp.Exchange exchange) throws IOException {
+			CustomExchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
 			v.set("code", "The Code field is required.");
@@ -169,7 +169,7 @@ public class UserWeb {
 		var t = Jwt.generateToken(h, p, configuration.getProperty("eshopweb.jwt.key"));
 		exchange.addUserCookie(t);
 
-		var b = ((CustomHttpExchange) exchange).getBasket(false);
+		var b = ((CustomExchange) exchange).getBasket(false);
 		if (b != null) {
 			transferBasket(b, u);
 			exchange.removeBasketCookie();
@@ -185,7 +185,7 @@ public class UserWeb {
 
 	@Handle(method = "POST", path = "/user/login/recovery")
 	public Object authenticate(Recovery.Form form, @Bind("returnUrl") URI returnURI,
-			EShopWebApp.Exchange exchange) throws IOException {
+			CustomExchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.code.isBlank())
 			v.set("code", "The Code field is required.");
@@ -196,7 +196,7 @@ public class UserWeb {
 			var s = f.parseHex(u.getSalt());
 			var h = f.formatHex(ApplicationUser.hash(form.code.toCharArray(), s));
 			if (u.getTwoFactor().recoveryCodeHashes().remove(h))
-				persistence.getCrud(ApplicationUser.class).update(u.getId(), x -> {
+				persistence.crud(ApplicationUser.class).update(u.getId(), x -> {
 					x.setTwoFactor(u.getTwoFactor());
 					return x;
 				});
@@ -213,7 +213,7 @@ public class UserWeb {
 		var t = Jwt.generateToken(h2, p, configuration.getProperty("eshopweb.jwt.key"));
 		exchange.addUserCookie(t);
 
-		var b = ((CustomHttpExchange) exchange).getBasket(false);
+		var b = ((CustomExchange) exchange).getBasket(false);
 		if (b != null) {
 			transferBasket(b, u);
 			exchange.removeBasketCookie();
@@ -223,7 +223,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/logout")
-	public URI logout(EShopWebApp.Exchange exchange) {
+	public URI logout(CustomExchange exchange) {
 		exchange.removeUserCookie();
 		return URI.create("/");
 	}
@@ -234,7 +234,7 @@ public class UserWeb {
 	}
 
 	@Handle(method = "POST", path = "/user/reset-password")
-	public Object resetPassword(ResetPassword.Form form, EShopWebApp.Exchange exchange) throws IOException {
+	public Object resetPassword(ResetPassword.Form form, CustomExchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");
@@ -262,7 +262,7 @@ public class UserWeb {
 	static Pattern uppercasePattern = Pattern.compile("[A-Z]");
 
 	@Handle(method = "POST", path = "/user/register")
-	public Object createAccount(Register.Form form, EShopWebApp.Exchange exchange) throws IOException {
+	public Object createAccount(Register.Form form, CustomExchange exchange) throws IOException {
 		var v = new ValidationMessages();
 		if (form.email.isBlank())
 			v.set("email", "The Email field is required.");
@@ -282,7 +282,7 @@ public class UserWeb {
 			if (!uppercasePattern.matcher(form.password).find())
 				v.add(null, "Passwords must have at least one uppercase ('A'-'Z').");
 		}
-		var c = persistence.getCrud(ApplicationUser.class);
+		var c = persistence.crud(ApplicationUser.class);
 		if (v.isEmpty() && c.count("email", form.email) > 0)
 			v.add(null, "Username '" + form.email + "' is already taken.");
 		if (!v.isEmpty())
@@ -300,7 +300,7 @@ public class UserWeb {
 		var t = Jwt.generateToken(h, p, configuration.getProperty("eshopweb.jwt.key"));
 		exchange.addUserCookie(t);
 
-		var b = ((CustomHttpExchange) exchange).getBasket(false);
+		var b = ((CustomExchange) exchange).getBasket(false);
 		if (b != null) {
 			transferBasket(b, u);
 			exchange.removeBasketCookie();
@@ -309,12 +309,12 @@ public class UserWeb {
 	}
 
 	protected void transferBasket(Basket anonymous, ApplicationUser user) throws IOException {
-		var c = persistence.getCrud(BasketItem.class);
+		var c = persistence.crud(BasketItem.class);
 		var i = c.read(c.filter("basket", anonymous.getId())).toList();
 		if (!i.isEmpty()) {
-			var d = persistence.getCrud(Basket.class);
+			var d = persistence.crud(Basket.class);
 			var b = d.read(d.filter("buyer", user.getUserName())).findFirst().orElse(null);
-			persistence.getDatabase().perform((ss, ii) -> {
+			persistence.database().perform((ss, ii) -> {
 				var b2 = b;
 				if (b2 == null) {
 					b2 = new Basket();

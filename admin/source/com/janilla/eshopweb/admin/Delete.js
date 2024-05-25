@@ -34,14 +34,14 @@ class Delete {
 	}
 
 	get layout() {
-		return this.engine.stack[0].target;
+		return this.engine.stack[0].value;
 	}
 
-	render = async e => {
-		if (engine.isRendering(this)) {
-			this.engine = e.clone();
-			return await engine.render(this, 'Delete');
-		}
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			o.template = 'Delete';
+		});
 	}
 
 	listen = () => {
@@ -51,7 +51,7 @@ class Delete {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.engine.render(this, 'Delete');
+		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
 

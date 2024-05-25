@@ -42,35 +42,35 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "GET", path = "/api/catalog-items")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
+	public Object list(CustomExchange exchange) throws IOException {
 		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogItem.class);
+		var c = persistence.crud(CatalogItem.class);
 		var i = c.list();
 		var j = c.read(i).toList();
 		return Map.of("catalogItems", j, "pageCount", 1);
 	}
 
 	@Handle(method = "POST", path = "/api/catalog-items")
-	public Object create(CatalogItem item, EShopApiApp.Exchange exchange) throws IOException {
+	public Object create(CatalogItem item, CustomExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		item.setPictureUri(URI.create("/eCatalog-item-default.png"));
-		var c = persistence.getCrud(CatalogItem.class);
+		var c = persistence.crud(CatalogItem.class);
 		var i = c.create(item);
 		return Map.of("catalogItem", i);
 	}
 
 	@Handle(method = "PUT", path = "/api/catalog-items")
-	public Object update(CatalogItem item, EShopApiApp.Exchange exchange) throws IOException {
+	public Object update(CatalogItem item, CustomExchange exchange) throws IOException {
 		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogItem.class);
+		var c = persistence.crud(CatalogItem.class);
 		var i = c.update(item.getId(), x -> Reflection.copy(item, x, y -> !Set.of("id", "pictureUri").contains(y)));
 		return Map.of("catalogItem", i);
 	}
 
 	@Handle(method = "DELETE", path = "/api/catalog-items/(\\d+)")
-	public Object delete(long id, EShopApiApp.Exchange exchange) throws IOException {
+	public Object delete(long id, CustomExchange exchange) throws IOException {
 		exchange.requireAdministrator();
-		persistence.getCrud(CatalogItem.class).delete(id);
+		persistence.crud(CatalogItem.class).delete(id);
 		return Map.of("status", "Deleted");
 	}
 }

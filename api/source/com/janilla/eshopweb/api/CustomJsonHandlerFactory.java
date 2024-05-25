@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
@@ -38,7 +37,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 	}
 
 	@Override
-	protected void render(Object object, HttpExchange exchange) throws IOException {
+	protected void render(Object object, HttpExchange exchange) {
 		var o = configuration.getProperty("eshopweb.api.cors.origin");
 		exchange.getResponse().getHeaders().set("Access-Control-Allow-Origin", o);
 

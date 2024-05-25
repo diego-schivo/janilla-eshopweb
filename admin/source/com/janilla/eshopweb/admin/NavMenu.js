@@ -54,17 +54,16 @@ class NavMenu {
 	}
 
 	get layout() {
-		return this.engine.stack[0].target;
+		return this.engine.stack[0].value;
 	}
 
-	render = async e => {
-		if (engine.isRendering(this)) {
-			this.engine = e.clone();
-			return await engine.render(this, 'NavMenu');
-		}
-
-		if (engine.isRendering(this, 'items', true))
-			return await engine.render(engine.target, 'NavMenu-Item');
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			o.template = 'NavMenu';
+		}) || await engine.match([this, 'items', 'number'], async (_, o) => {
+			o.template = 'NavMenu-Item';
+		});
 	}
 
 	listen = () => {

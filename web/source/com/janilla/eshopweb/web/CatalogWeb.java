@@ -48,14 +48,14 @@ public class CatalogWeb {
 	@Handle(method = "GET", path = "/")
 	public Catalog getCatalog(@Bind("brand") long brand, @Bind("type") long type,
 			@Bind("page") int page) throws IOException {
-		var c1 = persistence.getCrud(CatalogBrand.class);
+		var c1 = persistence.crud(CatalogBrand.class);
 		var b = Stream
 				.concat(Stream.of(new Option(null, "All", false)),
 						c1.read(c1.filter("name"))
 								.map(x -> new Option(String.valueOf(x.getId()), x.getName(), x.getId() == brand)))
 				.toList();
 
-		var c2 = persistence.getCrud(CatalogType.class);
+		var c2 = persistence.crud(CatalogType.class);
 		var t = Stream
 				.concat(Stream.of(new Option(null, "All", false)),
 						c2.read(c2.filter("name"))
@@ -64,7 +64,7 @@ public class CatalogWeb {
 
 		var f = new Filters(b, t);
 
-		var c3 = persistence.getCrud(CatalogItem.class);
+		var c3 = persistence.crud(CatalogItem.class);
 		var p = c3.filter(Map.of("catalogBrand", brand > 0 ? new Object[] { brand } : new Object[0], "catalogType",
 				type > 0 ? new Object[] { type } : new Object[0]), page * 10, 10);
 

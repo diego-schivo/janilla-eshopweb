@@ -41,16 +41,16 @@ import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.UnauthenticatedException;
 
-abstract class CustomHttpExchange extends HttpExchange {
+public class CustomExchange extends HttpExchange {
 
-	Properties configuration;
+	public Properties configuration;
 
-	Persistence persistence;
+	public Persistence persistence;
 
 	private boolean authenticateUser;
 
 	private IO.Supplier<ApplicationUser> user = IO.Lazy.of(() -> {
-		var c = persistence.getCrud(ApplicationUser.class);
+		var c = persistence.crud(ApplicationUser.class);
 		Map<String, ?> p;
 		{
 			var t = getUserCookie();
@@ -81,12 +81,12 @@ abstract class CustomHttpExchange extends HttpExchange {
 		var i = u != null ? u.getUserName() : null;
 		if (i == null)
 			i = getBasketCookie();
-		var c = persistence.getCrud(Basket.class);
+		var c = persistence.crud(Basket.class);
 		var b = i != null ? c.read(c.find("buyer", i)) : null;
 		if (b == null && createBasket) {
 
 			if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo"))
-					&& persistence.getCrud(Basket.class).count() >= 1000)
+					&& persistence.crud(Basket.class).count() >= 1000)
 				throw new MethodBlockedException();
 
 			var d = new Basket();

@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
@@ -40,7 +39,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	}
 
 	@Override
-	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo")))
 			switch (exchange.getRequest().getMethod().name()) {
 			case "GET", "OPTIONS":

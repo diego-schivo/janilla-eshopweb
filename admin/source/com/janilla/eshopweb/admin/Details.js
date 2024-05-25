@@ -33,11 +33,11 @@ class Details {
 		return this.item ? 'block' : 'none';
 	}
 
-	render = async e => {
-		if (engine.isRendering(this)) {
-			this.engine = e.clone();
-			return await engine.render(this, 'Details');
-		}
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			o.template = 'Details';
+		});
 	}
 
 	listen = () => {
@@ -47,7 +47,7 @@ class Details {
 	}
 
 	refresh = async () => {
-		this.selector().outerHTML = await this.engine.render(this, 'Details');
+		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
 

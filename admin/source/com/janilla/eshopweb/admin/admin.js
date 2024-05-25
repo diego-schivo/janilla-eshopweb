@@ -45,41 +45,39 @@ class Layout {
 				Authorization: `Bearer ${this.user.token}`
 			};
 			const r = new RenderEngine();
-			this.selector().innerHTML = await r.render(this, 'Layout');
+			this.selector().innerHTML = await r.render({ value: this });
 			this.listen();
 		} else
 			location.href = '/user/login?returnUrl=%2fAdmin';
 	}
 
-	render = async e => {
-		if (engine.isRendering(this, 'sidebar'))
-			return this.user.roles.includes('Administrators') ? await engine.render(this, 'Layout-sidebar') : null;
-
-		if (engine.isRendering(this, 'navMenu')) {
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			o.template = 'Layout';
+		}) || await engine.match([this, 'sidebar'], async (_, o) => {
+			if (this.user.roles.includes('Administrators'))
+				o.template = 'Layout-sidebar';
+		}) || await engine.match([this, undefined, 'navMenu'], async (_, o) => {
 			this.navMenu = new NavMenu();
 			this.navMenu.selector = () => this.selector().querySelector('.sidebar').firstElementChild;
-			return this.navMenu;
-		}
-
-		if (engine.isRendering(this, 'toast')) {
+			o.value = this.navMenu;
+		}) || await engine.match([this, 'toast'], async (_, o) => {
 			this.toast = new Toast();
 			this.toast.selector = () => this.selector().querySelector('.content').firstElementChild;
-			return this.toast;
-		}
-
-		if (engine.isRendering(this, 'catalog')) {
+			o.value = this.toast;
+		}) || await engine.match([this, 'catalog'], async (_, o) => {
 			if (this.user.roles.includes('Administrators')) {
 				this.catalog = new Catalog();
 				this.catalog.selector = () => this.selector().querySelector('.content').lastElementChild;
-				return this.catalog;
+				o.value = this.catalog;
 			} else
-				return await engine.render(this, 'Layout-unauthorized');
-		}
+				o.template = 'Layout-unauthorized';
+		});
 	}
 
 	listen = () => {
 		this.navMenu?.listen();
-		this.toast.listen();
+		this.toast?.listen();
 		this.catalog?.listen();
 	}
 }

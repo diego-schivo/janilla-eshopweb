@@ -41,17 +41,18 @@ import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.NotFoundException;
+import com.janilla.web.WebHandler;
 
 public class EShopWebApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var p = new Properties();
 		try (var s = EShopWebApp.class.getResourceAsStream("configuration.properties")) {
 			p.load(s);
 		}
 
 		var a = new EShopWebApp();
-		a.setConfiguration(p);
+		a.configuration = p;
 		a.getPersistence();
 
 		var s = new HttpServer();
@@ -60,37 +61,31 @@ public class EShopWebApp {
 		s.run();
 	}
 
-	private Properties configuration;
+	public Properties configuration;
 
 	private Supplier<Factory> factory = Lazy.of(() -> {
 		var f = new Factory();
 		f.setTypes(Stream.concat(Util.getPackageClasses("com.janilla.eshopweb.core"),
 				Util.getPackageClasses(getClass().getPackageName())).toList());
-		f.setEnclosing(this);
+		f.setSource(this);
 		return f;
 	});
 
 	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-//		var b = new CustomPersistenceBuilder();
-//		b.setApplication(this);
-		var f = getFactory();
-		var b = f.newInstance(ApplicationPersistenceBuilder.class);
+		var b = getFactory().create(ApplicationPersistenceBuilder.class);
 		return b.build();
 	});
 
 	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
 		var a = new EShopAdminApp();
-		a.setConfiguration(configuration);
+		a.configuration = configuration;
 		return a;
 	});
 
-	static ThreadLocal<IO.Consumer<HttpExchange>> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<WebHandler> currentHandler = new ThreadLocal<>();
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-//		var b = new CustomApplicationHandlerBuilder();
-//		b.setApplication(this);
-		var f1 = getFactory();
-		var b = f1.newInstance(ApplicationHandlerBuilder.class);
+	Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		var hh = List.of(getAdmin().getHandler(), b.build());
 		return e -> {
 			try {
@@ -106,7 +101,7 @@ public class EShopWebApp {
 				h = hh.get(0);
 			for (;;) {
 				if (h == hh.get(1)) {
-					var f = new Exchange();
+					var f = getFactory().create(HttpExchange.class);
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
 					f.setException(e.getException());
@@ -114,7 +109,7 @@ public class EShopWebApp {
 				}
 				currentHandler.set(h);
 				try {
-					h.accept(e);
+					h.handle(e);
 					currentHandler.remove();
 					break;
 				} catch (NotFoundException f) {
@@ -127,12 +122,8 @@ public class EShopWebApp {
 		};
 	});
 
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
+	public EShopWebApp getApplication() {
+		return this;
 	}
 
 	public Factory getFactory() {
@@ -151,14 +142,7 @@ public class EShopWebApp {
 		return admin.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
-	}
-
-	public class Exchange extends CustomHttpExchange {
-		{
-			configuration = getConfiguration();
-			persistence = getPersistence();
-		}
 	}
 }

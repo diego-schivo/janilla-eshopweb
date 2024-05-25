@@ -39,9 +39,9 @@ public class CatalogBrandApi {
 	}
 
 	@Handle(method = "GET", path = "/api/catalog-brands")
-	public Object list(EShopApiApp.Exchange exchange) throws IOException {
+	public Object list(CustomExchange exchange) throws IOException {
 		exchange.requireAdministrator();
-		var c = persistence.getCrud(CatalogBrand.class);
+		var c = persistence.crud(CatalogBrand.class);
 		var i = c.list();
 		var r = c.read(i).toList();
 		return Map.of("catalogBrands", r);

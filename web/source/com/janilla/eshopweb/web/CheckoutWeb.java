@@ -54,11 +54,11 @@ public class CheckoutWeb {
 
 	@Handle(method = "GET", path = "/basket/checkout")
 	public Checkout getCheckout(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		e.getUser(true);
 		var b = e.getBasket(false);
-		var c1 = persistence.getCrud(BasketItem.class);
-		var c2 = persistence.getCrud(CatalogItem.class);
+		var c1 = persistence.crud(BasketItem.class);
+		var c2 = persistence.crud(CatalogItem.class);
 		var i = new ArrayList<Item>();
 		for (var j = c1.read(c1.filter("basket", b.getId())).iterator(); j.hasNext();) {
 			var i1 = j.next();
@@ -70,7 +70,7 @@ public class CheckoutWeb {
 
 	@Handle(method = "POST", path = "/basket/checkout")
 	public URI pay(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var b = e.getBasket(false);
 		var o = new Order();
 		o.setBuyer(b.getBuyer());
@@ -78,15 +78,15 @@ public class CheckoutWeb {
 		o.setShipToAddress(new Address("123 Main St.", "Kent", "OH", "United States", "44240"));
 		Map<BasketItem, CatalogItem> m = new HashMap<>();
 		{
-			var c = persistence.getCrud(BasketItem.class);
+			var c = persistence.crud(BasketItem.class);
 			for (var j = c.read(c.filter("basket", b.getId())).iterator(); j.hasNext();) {
 				var i1 = j.next();
-				var i2 = persistence.getCrud(CatalogItem.class).read(i1.getCatalogItem());
+				var i2 = persistence.crud(CatalogItem.class).read(i1.getCatalogItem());
 				m.put(i1, i2);
 			}
 		}
-		persistence.getDatabase().perform((ss, ii) -> {
-			persistence.getCrud(Order.class).create(o);
+		persistence.database().perform((ss, ii) -> {
+			persistence.crud(Order.class).create(o);
 			for (var f : m.entrySet()) {
 				var i1 = f.getKey();
 				var i2 = f.getValue();
@@ -95,9 +95,9 @@ public class CheckoutWeb {
 				i3.setItemOrdered(new CatalogItemOrdered(i2.getId(), i2.getName(), i2.getPictureUri()));
 				i3.setUnitPrice(i1.getUnitPrice());
 				i3.setUnits(i1.getQuantity());
-				persistence.getCrud(OrderItem.class).create(i3);
+				persistence.crud(OrderItem.class).create(i3);
 			}
-			persistence.getCrud(Basket.class).delete(b.getId());
+			persistence.crud(Basket.class).delete(b.getId());
 			return null;
 		}, true);
 		return URI.create("/basket/success");

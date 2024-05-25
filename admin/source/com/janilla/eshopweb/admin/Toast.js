@@ -25,9 +25,10 @@ class Toast {
 
 	selector;
 
-	render = async e => {
-		if (engine.isRendering(this))
-			return await engine.render(this, 'Toast');
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			o.template = 'Toast';
+		});
 	}
 
 	listen = () => {

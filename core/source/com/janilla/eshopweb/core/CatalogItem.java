@@ -30,6 +30,7 @@ import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 
 @Store
+//@Index
 public class CatalogItem {
 
 	private long id;

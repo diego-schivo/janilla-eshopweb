@@ -51,7 +51,7 @@ public class AccountWeb {
 
 	@Handle(method = "GET", path = "/account/profile")
 	public Account getProfile(HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 		var m = Profile.statusMessages.remove(u.getId());
 		return new Account(new Profile(m, u, null));
 	}
@@ -60,7 +60,7 @@ public class AccountWeb {
 
 	@Handle(method = "POST", path = "/account/profile")
 	public Object updateProfile(ApplicationUser user, HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 
 		var v = new EntryList<String, String>();
 		if (user.getEmail().isBlank())
@@ -74,7 +74,7 @@ public class AccountWeb {
 			return new Account(new Profile(null, user, v));
 		}
 
-		var c = persistence.getCrud(ApplicationUser.class);
+		var c = persistence.crud(ApplicationUser.class);
 		c.update(u.getId(), w -> Reflection.copy(user, w, n -> Set.of("username", "email").contains(n)));
 		Profile.statusMessages.put(u.getId(), "Your profile has been updated");
 		return URI.create("/account/profile");
@@ -82,21 +82,21 @@ public class AccountWeb {
 
 	@Handle(method = "POST", path = "/account/verification")
 	public URI sendVerificationEmail(HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 		Profile.statusMessages.put(u.getId(), "Verification email sent. Please check your email.");
 		return URI.create("/account/profile");
 	}
 
 	@Handle(method = "GET", path = "/account/password")
 	public Account getPassword(HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 		var m = Password.statusMessages.remove(u.getId());
 		return new Account(new Password(m, null, null));
 	}
 
 	@Handle(method = "POST", path = "/account/password")
 	public Object changePassword(Password.Form form, HttpExchange exchange) throws IOException {
-		var u = ((CustomHttpExchange) exchange).getUser(true);
+		var u = ((CustomExchange) exchange).getUser(true);
 
 		var v = new EntryList<String, String>();
 		if (form.oldPassword.isBlank())
@@ -112,7 +112,7 @@ public class AccountWeb {
 		if (!v.isEmpty())
 			return new Account(new Password(null, form, v));
 
-		var c = persistence.getCrud(ApplicationUser.class);
+		var c = persistence.crud(ApplicationUser.class);
 		c.update(u.getId(), w -> ApplicationUser.setHashAndSalt(w, form.newPassword));
 		Password.statusMessages.put(u.getId(), "Your password has been changed.");
 		return URI.create("/manage/change-password");

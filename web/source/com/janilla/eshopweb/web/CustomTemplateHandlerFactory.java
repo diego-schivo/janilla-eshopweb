@@ -23,8 +23,6 @@
  */
 package com.janilla.eshopweb.web;
 
-import java.io.IOException;
-
 import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.RenderEngine.Entry;
@@ -34,19 +32,19 @@ import com.janilla.web.TemplateHandlerFactory;
 public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	@Override
-	protected void render(Entry input, HttpExchange exchange) throws IOException {
+	protected void render(Entry input, HttpExchange exchange) {
 		var o = input.getValue();
 		if (o instanceof Page p)
 			input = RenderEngine.Entry.of(null, toLayout(p, exchange), null);
 		super.render(input, exchange);
 	}
 
-	static Layout toLayout(Page p, HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+	static Layout toLayout(Page p, HttpExchange exchange) {
+		var e = (CustomExchange) exchange;
 		var b = e.getBasket(false);
 		var q = 0;
 		if (b != null) {
-			var c = e.persistence.getCrud(BasketItem.class);
+			var c = e.persistence.crud(BasketItem.class);
 			var i = c.filter("basket", b.getId());
 			q = c.read(i).mapToInt(BasketItem::getQuantity).sum();
 		}

@@ -45,10 +45,10 @@ public class OrderWeb {
 
 	@Handle(method = "GET", path = "/order/history")
 	public History getHistory(HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
-		var c = persistence.getCrud(Order.class);
-		var d = persistence.getCrud(OrderItem.class);
+		var c = persistence.crud(Order.class);
+		var d = persistence.crud(OrderItem.class);
 		var i = c.read(c.filter("buyer", u.getUserName())).map(o -> {
 			var t = d.read(d.filter("order", o.getId())).reduce(BigDecimal.ZERO,
 					(a, b) -> a.add(b.getUnitPrice().multiply(BigDecimal.valueOf(b.getUnits()))), (a, b) -> a);
@@ -59,16 +59,16 @@ public class OrderWeb {
 
 	@Handle(method = "GET", path = "/order/detail/(\\d+)")
 	public Detail getDetail(long id, HttpExchange exchange) throws IOException {
-		var e = (CustomHttpExchange) exchange;
+		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		Order o;
 		{
-			var c = persistence.getCrud(Order.class);
+			var c = persistence.crud(Order.class);
 			o = c.read(id);
 		}
 		if (!o.getBuyer().equals(u.getUserName()))
 			throw new ForbiddenException();
-		var c = persistence.getCrud(OrderItem.class);
+		var c = persistence.crud(OrderItem.class);
 		var i = c.read(c.filter("order", o.getId())).toList();
 		var j = i.stream().map(x -> new Detail.Item(x, x.getUnitPrice().multiply(BigDecimal.valueOf(x.getUnits()))))
 				.toList();

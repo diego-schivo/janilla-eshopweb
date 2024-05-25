@@ -23,15 +23,11 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
@@ -39,59 +35,51 @@ import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.WebHandler;
 
 public class EShopApiApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var a = new EShopApiApp();
 		{
 			var c = new Properties();
 			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
 				c.load(s);
 			}
-			a.setConfiguration(c);
+			a.configuration = c;
 		}
 		a.getPersistence();
 
-		var s = a.new Server();
-		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.api.server.port")));
+		var s = a.getFactory().create(HttpServer.class);
+		s.setPort(Integer.parseInt(a.configuration.getProperty("eshopweb.api.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	private Properties configuration;
+	public Properties configuration;
 
 	private Supplier<Factory> factory = Lazy.of(() -> {
 		var f = new Factory();
-		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
-		f.setEnclosing(this);
+		f.setTypes(Stream.concat(Util.getPackageClasses("com.janilla.eshopweb.core"),
+				Util.getPackageClasses(getClass().getPackageName())).toList());
+		f.setSource(this);
 		return f;
 	});
 
-	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-//		var b = new CustomPersistenceBuilder();
-//		b.setApplication(this);
-		var f = getFactory();
-		var b = f.newInstance(ApplicationPersistenceBuilder.class);
+	private Supplier<Persistence> persistence = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationPersistenceBuilder.class);
 		return b.build();
 	});
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-//		var b = new CustomApplicationHandlerBuilder();
-//		b.setApplication(this);
-		var f = getFactory();
-		var b = f.newInstance(ApplicationHandlerBuilder.class);
+	Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		return b.build();
 	});
 
 	AnnotationDrivenToMethodInvocation toInvocation;
 
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
+	public EShopApiApp getApplication() {
+		return this;
 	}
 
 	public Factory getFactory() {
@@ -99,33 +87,14 @@ public class EShopApiApp {
 	}
 
 	public Persistence getPersistence() {
-		try {
-			return persistence.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return persistence.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
 	}
 
 	public AnnotationDrivenToMethodInvocation getToInvocation() {
 		return toInvocation;
-	}
-
-	class Server extends HttpServer {
-
-		@Override
-		protected HttpExchange createExchange(HttpRequest request) {
-			return new Exchange();
-		}
-	}
-
-	public class Exchange extends CustomHttpExchange {
-		{
-			configuration = getConfiguration();
-			persistence = getPersistence();
-		}
 	}
 }

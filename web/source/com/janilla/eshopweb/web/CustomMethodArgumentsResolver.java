@@ -38,8 +38,8 @@ public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
 			EntryList<String, String> entries, Supplier<String> body,
 			Supplier<UnaryOperator<Converter.MapType>> resolver) {
-		if (type == EShopWebApp.Exchange.class)
-			return (EShopWebApp.Exchange) exchange;
+		if (type == CustomExchange.class)
+			return (CustomExchange) exchange;
 		return super.resolveArgument(type, exchange, values, entries, body, resolver);
 	}
 }

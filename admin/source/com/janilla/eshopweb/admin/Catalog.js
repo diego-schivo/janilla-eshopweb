@@ -48,44 +48,34 @@ class Catalog {
 	delete;
 
 	get layout() {
-		return this.engine.stack[0].target;
+		return this.engine.stack[0].value;
 	}
 
-	render = async e => {
-		if (engine.isRendering(this)) {
-			this.engine = e.clone();
-			return await engine.render(this, 'Catalog');
-		}
-
-		if (engine.isRendering(this, 'catalogType'))
-			return this.catalogTypes.find(x => x.id === engine.target.catalogType)?.name;
-
-		if (engine.isRendering(this, 'catalogBrand'))
-			return this.catalogBrands.find(x => x.id === engine.target.catalogBrand)?.name;
-
-		if (engine.isRendering(this, 'details')) {
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			o.template = this.catalogItems ? 'Catalog2' : 'Catalog';
+		}) || await engine.match([this, 'catalogType'], async (_, o) => {
+			o.value = this.catalogTypes.find(x => x.id === engine.target.catalogType)?.name;
+		}) || await engine.match([this, 'catalogBrand'], async (_, o) => {
+			o.value = this.catalogBrands.find(x => x.id === engine.target.catalogBrand)?.name;
+		}) || await engine.match([this, 'details'], async (_, o) => {
 			this.details = new Details();
 			this.details.selector = () => Array.from(this.selector().children).at(-4);
-			return this.details;
-		}
-
-		if (engine.isRendering(this, 'edit')) {
+			o.value = this.details;
+		}) || await engine.match([this, 'edit'], async (_, o) => {
 			this.edit = new Edit();
 			this.edit.selector = () => Array.from(this.selector().children).at(-3);
-			return this.edit;
-		}
-
-		if (engine.isRendering(this, 'create')) {
+			o.value = this.edit;
+		}) || await engine.match([this, 'create'], async (_, o) => {
 			this.create = new Create();
 			this.create.selector = () => Array.from(this.selector().children).at(-2);
-			return this.create;
-		}
-
-		if (engine.isRendering(this, 'delete')) {
+			o.value = this.create;
+		}) || await engine.match([this, 'delete'], async (_, o) => {
 			this.delete = new Delete();
 			this.delete.selector = () => this.selector().lastElementChild;
-			return this.delete;
-		}
+			o.value = this.delete;
+		});
 	}
 
 	listen = () => {
@@ -99,8 +89,8 @@ class Catalog {
 		e.addEventListener('deleteopen', this.handleDeleteOpen);
 		e.addEventListener('deleteclose', this.handleDeleteClose);
 		if (!this.catalogItems)
-			this.fetchItems().then(c => {
-				return this.engine.render(this, 'Catalog2');
+			this.fetchItems().then(_ => {
+				return this.engine.render({ value: this });
 			}).then(h => {
 				this.selector().outerHTML = h;
 				this.listen();
@@ -120,7 +110,7 @@ class Catalog {
 		delete this.edit;
 		delete this.create;
 		delete this.delete;
-		this.selector().outerHTML = await this.engine.render(this, 'Catalog');
+		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
 
@@ -172,13 +162,13 @@ class Catalog {
 
 	handleEditClose = async e => {
 		document.body.classList.remove('body-no-overflow');
-		if (e.detail.catalogItem)
+		if (e.detail?.catalogItem)
 			await this.refresh();
 	}
 
 	handleCreateClose = async e => {
 		document.body.classList.remove('body-no-overflow');
-		if (e.detail.catalogItem)
+		if (e.detail?.catalogItem)
 			await this.refresh();
 	}
 
@@ -190,7 +180,7 @@ class Catalog {
 
 	handleDeleteClose = async e => {
 		document.body.classList.remove('body-no-overflow');
-		if (e.detail.status === 'Deleted')
+		if (e.detail?.status === 'Deleted')
 			await this.refresh();
 	}
 }

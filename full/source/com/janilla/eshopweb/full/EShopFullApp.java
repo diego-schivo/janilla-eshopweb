@@ -23,7 +23,6 @@
  */
 package com.janilla.eshopweb.full;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -33,13 +32,13 @@ import com.janilla.eshopweb.api.EShopApiApp;
 import com.janilla.eshopweb.web.EShopWebApp;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
 import com.janilla.util.Lazy;
 import com.janilla.web.NotFoundException;
+import com.janilla.web.WebHandler;
 
 public class EShopFullApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var a = new EShopFullApp();
 		{
 			var c = new Properties();
@@ -48,6 +47,7 @@ public class EShopFullApp {
 			}
 			a.setConfiguration(c);
 		}
+		a.getApi().getPersistence();
 
 		var s = new HttpServer();
 		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port")));
@@ -55,29 +55,29 @@ public class EShopFullApp {
 		s.run();
 	}
 
-	Properties configuration;
+	public Properties configuration;
 
 	Supplier<EShopApiApp> api = Lazy.of(() -> {
 		var a = new EShopApiApp();
-		a.setConfiguration(configuration);
+		a.configuration = configuration;
 		return a;
 	});
 
 	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
 		var a = new EShopAdminApp();
-		a.setConfiguration(configuration);
+		a.configuration = configuration;
 		return a;
 	});
 
 	Supplier<EShopWebApp> web = Lazy.of(() -> {
 		var a = new EShopWebApp();
-		a.setConfiguration(configuration);
+		a.configuration = configuration;
 		return a;
 	});
 
-	static ThreadLocal<IO.Consumer<HttpExchange>> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<WebHandler> currentHandler = new ThreadLocal<>();
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
+	Supplier<WebHandler> handler = Lazy.of(() -> {
 		var hh = List.of(getAdmin().getHandler(), getWeb().getHandler(), getApi().getHandler());
 		return e -> {
 			try {
@@ -94,9 +94,9 @@ public class EShopFullApp {
 			for (;;) {
 				var f = e;
 				if (h == hh.get(1))
-					f = getWeb().new Exchange();
+					f = getWeb().getFactory().create(HttpExchange.class);
 				if (h == hh.get(2))
-					f = getApi().new Exchange();
+					f = getApi().getFactory().create(HttpExchange.class);
 				if (f != e) {
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
@@ -104,7 +104,7 @@ public class EShopFullApp {
 				}
 				currentHandler.set(h);
 				try {
-					h.accept(f);
+					h.handle(f);
 					currentHandler.remove();
 					break;
 				} catch (NotFoundException g) {
@@ -137,7 +137,7 @@ public class EShopFullApp {
 		return web.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
 	}
 }

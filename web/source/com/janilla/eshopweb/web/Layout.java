@@ -32,12 +32,12 @@ import java.time.format.DateTimeFormatter;
 
 import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
 import com.janilla.web.Render;
 
 @Render("Layout.html")
 public record Layout(ApplicationUser user, @Render("Layout-Basket.html") int basket, Page page)
-		implements Renderer {
+		implements RenderParticipant {
 
 	public Login login() {
 		return user == null ? new Login() : null;
@@ -53,7 +53,7 @@ public record Layout(ApplicationUser user, @Render("Layout-Basket.html") int bas
 			.withZone(ZoneOffset.UTC);
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
+	public boolean render(RenderEngine engine) {
 		record A(BigDecimal decimal) {
 		}
 		record B(Instant instant) {

@@ -35,18 +35,18 @@ import com.janilla.persistence.Persistence;
 import com.janilla.web.ForbiddenException;
 import com.janilla.web.UnauthenticatedException;
 
-abstract class CustomHttpExchange extends HttpExchange {
+public class CustomExchange extends HttpExchange {
 
-	Properties configuration;
+	public Properties configuration;
 
-	Persistence persistence;
+	public Persistence persistence;
 
 	private IO.Supplier<ApplicationUser> user = IO.Lazy.of(() -> {
 		var a = getRequest().getHeaders().get("Authorization");
 		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
 		var p = t != null ? Jwt.verifyToken(t, configuration.getProperty("eshopweb.jwt.key")) : null;
 		var e = p != null ? (String) p.get("sub") : null;
-		var c = persistence.getCrud(ApplicationUser.class);
+		var c = persistence.crud(ApplicationUser.class);
 		var i = e != null ? c.find("email", e) : -1;
 		var u = i >= 0 ? c.read(i) : null;
 		return u;

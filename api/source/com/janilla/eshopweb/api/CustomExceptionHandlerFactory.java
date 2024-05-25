@@ -23,27 +23,25 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.io.IOException;
-
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.Error;
 import com.janilla.web.ExceptionHandlerFactory;
-import com.janilla.web.HandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	protected HandlerFactory mainFactory;
+	protected WebHandlerFactory mainFactory;
 
-	public void setMainFactory(HandlerFactory mainFactory) {
+	public void setMainFactory(WebHandlerFactory mainFactory) {
 		this.mainFactory = mainFactory;
 	}
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) throws IOException {
+	protected void handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var e = exchange.getException();
 		if (e instanceof Exception)
-			mainFactory.createHandler(RenderEngine.Entry.of(null, e.getMessage(), null), exchange).accept(exchange);
+			mainFactory.createHandler(RenderEngine.Entry.of(null, e.getMessage(), null), exchange).handle(exchange);
 	}
 }
