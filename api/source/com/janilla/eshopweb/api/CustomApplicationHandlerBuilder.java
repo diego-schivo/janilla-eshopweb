@@ -26,12 +26,13 @@ package com.janilla.eshopweb.api;
 import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	protected MethodHandlerFactory buildMethodHandlerFactory() {
-		var f = super.buildMethodHandlerFactory();
+	protected WebHandlerFactory buildMethodHandlerFactory() {
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
 		((EShopApiApp) factory.getSource()).toInvocation = (AnnotationDrivenToMethodInvocation) f.getToInvocation();
 		return f;
 	}

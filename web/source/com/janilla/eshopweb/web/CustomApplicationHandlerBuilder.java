@@ -25,12 +25,13 @@ package com.janilla.eshopweb.web;
 
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	protected MethodHandlerFactory buildMethodHandlerFactory() {
-		var f = super.buildMethodHandlerFactory();
+	protected WebHandlerFactory buildMethodHandlerFactory() {
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
 		f.setArgumentsResolver(new CustomMethodArgumentsResolver());
 		return f;
 	}
