@@ -33,8 +33,8 @@ import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
-import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.MethodHandlerFactory;
 import com.janilla.web.WebHandler;
 
 public class EShopApiApp {
@@ -58,6 +58,8 @@ public class EShopApiApp {
 
 	public Properties configuration;
 
+	public MethodHandlerFactory methodHandlerFactory;
+
 	private Supplier<Factory> factory = Lazy.of(() -> {
 		var f = new Factory();
 		f.setTypes(Stream.concat(Util.getPackageClasses("com.janilla.eshopweb.core"),
@@ -76,7 +78,7 @@ public class EShopApiApp {
 		return b.build();
 	});
 
-	AnnotationDrivenToMethodInvocation toInvocation;
+//	AnnotationDrivenToMethodInvocation toInvocation;
 
 	public EShopApiApp getApplication() {
 		return this;
@@ -94,7 +96,7 @@ public class EShopApiApp {
 		return handler.get();
 	}
 
-	public AnnotationDrivenToMethodInvocation getToInvocation() {
-		return toInvocation;
-	}
+//	public AnnotationDrivenToMethodInvocation getToInvocation() {
+//		return toInvocation;
+//	}
 }

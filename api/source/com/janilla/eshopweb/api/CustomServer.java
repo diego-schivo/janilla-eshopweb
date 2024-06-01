@@ -21,18 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.web;
+package com.janilla.eshopweb.api;
 
-import com.janilla.web.ApplicationHandlerBuilder;
-import com.janilla.web.MethodHandlerFactory;
-import com.janilla.web.WebHandlerFactory;
+import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpResponse;
+import com.janilla.http.HttpServer;
+import com.janilla.reflect.Factory;
 
-public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
+public class CustomServer extends HttpServer {
+
+	public Factory factory;
 
 	@Override
-	protected WebHandlerFactory buildMethodHandlerFactory() {
-		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
-		f.setArgumentsResolver(new CustomMethodArgumentsResolver());
-		return f;
+	protected HttpExchange buildExchange(HttpRequest request, HttpResponse response) {
+		var e = factory.create(HttpExchange.class);
+		e.setRequest(request);
+		e.setResponse(response);
+		return e;
 	}
 }

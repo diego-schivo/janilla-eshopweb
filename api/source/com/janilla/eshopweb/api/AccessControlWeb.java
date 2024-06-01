@@ -29,29 +29,21 @@ import java.util.stream.Collectors;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
 import com.janilla.http.HttpResponse.Status;
-import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.Handle;
+import com.janilla.web.MethodHandlerFactory;
 
 public class AccessControlWeb {
 
-	Properties configuration;
+	public Properties configuration;
 
-	AnnotationDrivenToMethodInvocation toInvocation;
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
-
-	public void setToInvocation(AnnotationDrivenToMethodInvocation toInvocation) {
-		this.toInvocation = toInvocation;
-	}
+	public MethodHandlerFactory methodHandlerFactory;
 
 	@Handle(method = "OPTIONS", path = "/api/(.*)")
 	public void allow(HttpRequest request, HttpResponse response) {
-		var o = configuration.getProperty("conduit.api.cors.origin");
-		var m = toInvocation.getValueAndGroupsStream(request).flatMap(w -> w.value().methods().stream())
+		var o = configuration.getProperty("eshopweb.api.cors.origin");
+		var m = methodHandlerFactory.getValueAndGroupsStream(request).flatMap(w -> w.value().methods().stream())
 				.map(x -> x.getAnnotation(Handle.class).method()).collect(Collectors.toSet());
-		var h = configuration.getProperty("conduit.api.cors.headers");
+		var h = configuration.getProperty("eshopweb.api.cors.headers");
 
 		response.setStatus(new Status(204, "No Content"));
 		response.getHeaders().set("Access-Control-Allow-Origin", o);

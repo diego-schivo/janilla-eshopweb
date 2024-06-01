@@ -21,25 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.eshopweb.api;
+package com.janilla.eshopweb.admin;
 
-import java.lang.reflect.Type;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.json.Converter;
-import com.janilla.util.EntryList;
-import com.janilla.web.MethodArgumentsResolver;
+public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
-public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
+	public EShopAdminApp application;
 
 	@Override
-	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
-			EntryList<String, String> entries, Supplier<String> body,
-			Supplier<UnaryOperator<Converter.MapType>> resolver) {
-		if (type == CustomExchange.class)
-			return (CustomExchange) exchange;
-		return super.resolveArgument(type, exchange, values, entries, body, resolver);
+	protected WebHandlerFactory buildMethodHandlerFactory() {
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
+		application.methodHandlerFactory = f;
+		return f;
 	}
 }
