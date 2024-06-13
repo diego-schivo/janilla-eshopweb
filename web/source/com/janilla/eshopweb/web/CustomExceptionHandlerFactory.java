@@ -27,7 +27,8 @@ import java.net.URI;
 
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpResponse.Status;
+import com.janilla.http.HttpHeader;
+import com.janilla.http.HttpResponse;
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
 import com.janilla.web.Error;
@@ -44,7 +45,7 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	}
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) {
+	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 
 		var e = exchange.getException();
@@ -56,20 +57,22 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 			};
 			if (p != null) {
 				var q = new EntryList<String, String>();
-				q.add("returnUrl", exchange.getRequest().getURI().toString());
+				q.add("returnUrl", exchange.getRequest().getUri().toString());
 				var u = URI.create("/user/login?" + Net.formatQueryString(q));
 				var s = exchange.getResponse();
-				s.setStatus(new Status(302, "Found"));
-				s.getHeaders().set("Cache-Control", "no-cache");
-				s.getHeaders().set("Location", u.toString());
-				return;
+				s.setStatus(HttpResponse.Status.of(302));
+				s.getHeaders().add(new HttpHeader("Cache-Control", "no-cache"));
+				s.getHeaders().add(new HttpHeader("Location", u.toString()));
+				return true;
 			}
 		}
 
 		if (e instanceof Page p) {
 			var l = CustomTemplateHandlerFactory.toLayout(p, exchange);
 			var h = mainFactory.createHandler(RenderEngine.Entry.of(null, l, null), exchange);
-			h.handle(exchange);
+			return h.handle(exchange);
 		}
+
+		return true;
 	}
 }

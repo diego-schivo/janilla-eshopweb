@@ -41,7 +41,6 @@ import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.NotFoundException;
-import com.janilla.web.WebHandler;
 
 public class EShopWebApp {
 
@@ -82,18 +81,18 @@ public class EShopWebApp {
 		return a;
 	});
 
-	static ThreadLocal<WebHandler> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<HttpServer.Handler> currentHandler = new ThreadLocal<>();
 
-	Supplier<WebHandler> handler = Lazy.of(() -> {
+	Supplier<HttpServer.Handler> handler = Lazy.of(() -> {
 		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		var hh = List.of(getAdmin().getHandler(), b.build());
 		return e -> {
 			try {
-				e.getRequest().getURI();
+				e.getRequest().getUri();
 //				System.out.println("u " + u);
 			} catch (NullPointerException f) {
 				f.printStackTrace();
-				return;
+				return false;
 			}
 			var h = currentHandler.get();
 			var n = h == null;
@@ -109,14 +108,14 @@ public class EShopWebApp {
 				}
 				currentHandler.set(h);
 				try {
-					h.handle(e);
-					currentHandler.remove();
-					break;
+					return h.handle(e);
 				} catch (NotFoundException f) {
 					var i = n ? hh.indexOf(h) + 1 : -1;
 					if (i < 0 || i >= hh.size())
 						throw new NotFoundException();
 					h = hh.get(i);
+				} finally {
+					currentHandler.remove();
 				}
 			}
 		};
@@ -142,7 +141,7 @@ public class EShopWebApp {
 		return admin.get();
 	}
 
-	public WebHandler getHandler() {
+	public HttpServer.Handler getHandler() {
 		return handler.get();
 	}
 }

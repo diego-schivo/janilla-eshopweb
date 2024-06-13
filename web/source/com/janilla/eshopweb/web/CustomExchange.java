@@ -36,6 +36,7 @@ import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.eshopweb.core.Basket;
 import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHeader;
 import com.janilla.io.IO;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
@@ -120,34 +121,36 @@ public class CustomExchange extends HttpExchange {
 	static String BASKET_COOKIE = "basket";
 
 	public void addBasketCookie(String value) {
-		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, value,
-				ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS).plusYears(10), "/", "strict"));
+		getResponse().getHeaders().add(new HttpHeader("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, value,
+				ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS).plusYears(10), "/", "strict")));
 	}
 
 	public String getBasketCookie() {
-		var c = getRequest().getHeaders().get("Cookie");
+		var c = getRequest().getHeaders().stream().filter(x -> x.name().equals("Cookie")).map(HttpHeader::value)
+				.findFirst().orElse(null);
 		return c != null ? Http.parseCookieHeader(c).get(BASKET_COOKIE) : null;
 	}
 
 	public void removeBasketCookie() {
-		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, null,
-				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict"));
+		getResponse().getHeaders().add(new HttpHeader("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, null,
+				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict")));
 	}
 
 	static String USER_COOKIE = "user";
 
 	public void addUserCookie(String value) {
-		getResponse().getHeaders().add("Set-Cookie",
-				Http.formatSetCookieHeader(USER_COOKIE, value, null, "/", "strict"));
+		getResponse().getHeaders()
+				.add(new HttpHeader("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, value, null, "/", "strict")));
 	}
 
 	public String getUserCookie() {
-		var c = getRequest().getHeaders().get("Cookie");
+		var c = getRequest().getHeaders().stream().filter(x -> x.name().equals("Cookie")).map(HttpHeader::value)
+				.findFirst().orElse(null);
 		return c != null ? Http.parseCookieHeader(c).get(USER_COOKIE) : null;
 	}
 
 	public void removeUserCookie() {
-		getResponse().getHeaders().add("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, null,
-				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict"));
+		getResponse().getHeaders().add(new HttpHeader("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, null,
+				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict")));
 	}
 }

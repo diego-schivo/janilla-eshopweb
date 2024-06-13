@@ -35,7 +35,6 @@ import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
-import com.janilla.web.WebHandler;
 
 public class EShopApiApp {
 
@@ -73,7 +72,7 @@ public class EShopApiApp {
 		return b.build();
 	});
 
-	Supplier<WebHandler> handler = Lazy.of(() -> {
+	Supplier<HttpServer.Handler> handler = Lazy.of(() -> {
 		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		return b.build();
 	});
@@ -92,7 +91,7 @@ public class EShopApiApp {
 		return persistence.get();
 	}
 
-	public WebHandler getHandler() {
+	public HttpServer.Handler getHandler() {
 		return handler.get();
 	}
 

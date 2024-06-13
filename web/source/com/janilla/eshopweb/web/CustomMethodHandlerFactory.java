@@ -45,7 +45,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 			case "GET":
 				break;
 			default:
-				switch (q.getURI().getPath()) {
+				switch (q.getUri().getPath()) {
 				case "/basket", "/basket/checkout", "/basket/update", "/user/login", "/user/logout":
 					break;
 				default:

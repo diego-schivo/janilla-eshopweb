@@ -38,10 +38,11 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 	}
 
 	@Override
-	protected void handle(Error error, HttpExchange exchange) {
+	protected boolean handle(Error error, HttpExchange exchange) {
 		super.handle(error, exchange);
 		var e = exchange.getException();
 		if (e instanceof Exception)
 			mainFactory.createHandler(RenderEngine.Entry.of(null, e.getMessage(), null), exchange).handle(exchange);
+		return true;
 	}
 }

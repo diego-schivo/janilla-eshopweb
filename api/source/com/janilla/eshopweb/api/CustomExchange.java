@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHeader;
 import com.janilla.io.IO;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
@@ -42,7 +43,8 @@ public class CustomExchange extends HttpExchange {
 	public Persistence persistence;
 
 	private IO.Supplier<ApplicationUser> user = IO.Lazy.of(() -> {
-		var a = getRequest().getHeaders().get("Authorization");
+		var a = getRequest().getHeaders().stream().filter(x -> x.name().equals("Authorization")).map(HttpHeader::value)
+				.findFirst().orElse(null);
 		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
 		var p = t != null ? Jwt.verifyToken(t, configuration.getProperty("eshopweb.jwt.key")) : null;
 		var e = p != null ? (String) p.get("sub") : null;
