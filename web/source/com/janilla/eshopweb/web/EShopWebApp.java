@@ -25,6 +25,7 @@ package com.janilla.eshopweb.web;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -32,8 +33,8 @@ import java.util.stream.Stream;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
@@ -54,10 +55,10 @@ public class EShopWebApp {
 		a.configuration = p;
 		a.getPersistence();
 
-		var s = new HttpServer();
-		s.setPort(Integer.parseInt(p.getProperty("eshopweb.web.server.port")));
+		var s = new Server();
+		s.setAddress(new InetSocketAddress(Integer.parseInt(p.getProperty("eshopweb.web.server.port"))));
 		s.setHandler(a.getHandler());
-		s.run();
+		s.serve();
 	}
 
 	public Properties configuration;
@@ -81,12 +82,13 @@ public class EShopWebApp {
 		return a;
 	});
 
-	static ThreadLocal<HttpServer.Handler> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<Server.Handler> currentHandler = new ThreadLocal<>();
 
-	Supplier<HttpServer.Handler> handler = Lazy.of(() -> {
+	Supplier<Server.Handler> handler = Lazy.of(() -> {
 		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		var hh = List.of(getAdmin().getHandler(), b.build());
-		return e -> {
+		return x -> {
+			var e = (HttpExchange) x;
 			try {
 				e.getRequest().getUri();
 //				System.out.println("u " + u);
@@ -103,7 +105,8 @@ public class EShopWebApp {
 					var f = getFactory().create(HttpExchange.class);
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
-					f.setException(e.getException());
+					// TODO
+//					f.setException(e.getException());
 					e = f;
 				}
 				currentHandler.set(h);
@@ -141,7 +144,7 @@ public class EShopWebApp {
 		return admin.get();
 	}
 
-	public HttpServer.Handler getHandler() {
+	public Server.Handler getHandler() {
 		return handler.get();
 	}
 }

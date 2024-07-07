@@ -27,8 +27,7 @@ import java.net.URI;
 
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHeader;
-import com.janilla.http.HttpResponse;
+import com.janilla.media.HeaderField;
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
 import com.janilla.web.Error;
@@ -60,9 +59,10 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 				q.add("returnUrl", exchange.getRequest().getUri().toString());
 				var u = URI.create("/user/login?" + Net.formatQueryString(q));
 				var s = exchange.getResponse();
-				s.setStatus(HttpResponse.Status.of(302));
-				s.getHeaders().add(new HttpHeader("Cache-Control", "no-cache"));
-				s.getHeaders().add(new HttpHeader("Location", u.toString()));
+//				s.setStatus(HttpResponse.Status.of(302));
+				s.setStatus(302);
+				s.getHeaders().add(new HeaderField("Cache-Control", "no-cache"));
+				s.getHeaders().add(new HeaderField("Location", u.toString()));
 				return true;
 			}
 		}

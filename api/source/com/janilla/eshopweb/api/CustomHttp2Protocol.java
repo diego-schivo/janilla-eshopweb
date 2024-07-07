@@ -23,29 +23,17 @@
  */
 package com.janilla.eshopweb.api;
 
-import java.util.Properties;
+import com.janilla.http.HttpRequest;
+import com.janilla.http2.Http2Exchange;
+import com.janilla.http2.Http2Protocol;
+import com.janilla.reflect.Factory;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.web.HandleException;
-import com.janilla.web.MethodHandlerFactory;
+public class CustomHttp2Protocol extends Http2Protocol {
 
-public class CustomMethodHandlerFactory extends MethodHandlerFactory {
-
-	Properties configuration;
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
+	public Factory factory;
 
 	@Override
-	protected void handle(Invocation invocation, HttpExchange exchange) {
-		if (Boolean.parseBoolean(configuration.getProperty("eshopweb.live-demo")))
-			switch (exchange.getRequest().getMethod()) {
-			case "GET", "OPTIONS":
-				break;
-			default:
-				throw new HandleException(new MethodBlockedException());
-			}
-		super.handle(invocation, exchange);
+	protected Http2Exchange createExchange(HttpRequest request) {
+		return factory.create(Http2Exchange.class);
 	}
 }

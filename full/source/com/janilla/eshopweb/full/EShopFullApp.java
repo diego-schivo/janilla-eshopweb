@@ -23,6 +23,7 @@
  */
 package com.janilla.eshopweb.full;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -31,7 +32,7 @@ import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.eshopweb.api.EShopApiApp;
 import com.janilla.eshopweb.web.EShopWebApp;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpServer;
+import com.janilla.net.Server;
 import com.janilla.util.Lazy;
 import com.janilla.web.NotFoundException;
 
@@ -48,10 +49,11 @@ public class EShopFullApp {
 		}
 		a.getApi().getPersistence();
 
-		var s = new HttpServer();
-		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port")));
+		var s = new Server();
+		s.setAddress(
+				new InetSocketAddress(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port"))));
 		s.setHandler(a.getHandler());
-		s.run();
+		s.serve();
 	}
 
 	public Properties configuration;
@@ -74,11 +76,12 @@ public class EShopFullApp {
 		return a;
 	});
 
-	static ThreadLocal<HttpServer.Handler> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<Server.Handler> currentHandler = new ThreadLocal<>();
 
-	Supplier<HttpServer.Handler> handler = Lazy.of(() -> {
+	Supplier<Server.Handler> handler = Lazy.of(() -> {
 		var hh = List.of(getAdmin().getHandler(), getWeb().getHandler(), getApi().getHandler());
-		return e -> {
+		return x -> {
+			var e = (HttpExchange) x;
 			try {
 				e.getRequest().getUri();
 //				System.out.println("u " + u);
@@ -99,7 +102,8 @@ public class EShopFullApp {
 				if (f != e) {
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
-					f.setException(e.getException());
+					// TODO
+					// f.setException(e.getException());
 				}
 				currentHandler.set(h);
 				try {
@@ -136,7 +140,7 @@ public class EShopFullApp {
 		return web.get();
 	}
 
-	public HttpServer.Handler getHandler() {
+	public Server.Handler getHandler() {
 		return handler.get();
 	}
 }

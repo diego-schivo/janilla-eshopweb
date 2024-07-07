@@ -26,7 +26,7 @@ package com.janilla.eshopweb.api;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import com.janilla.http.HttpHeader;
+import com.janilla.media.HeaderField;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpResponse;
 import com.janilla.web.Handle;
@@ -46,11 +46,12 @@ public class AccessControlWeb {
 				.map(x -> x.getAnnotation(Handle.class).method()).collect(Collectors.toSet());
 		var h = configuration.getProperty("eshopweb.api.cors.headers");
 
-		response.setStatus(HttpResponse.Status.of(204));
+//		response.setStatus(HttpResponse.Status.of(204));
+		response.setStatus(204);
 		var hh = response.getHeaders();
-		hh.add(new HttpHeader("Access-Control-Allow-Origin", o));
-		hh.add(new HttpHeader("Access-Control-Allow-Methods",
+		hh.add(new HeaderField("Access-Control-Allow-Origin", o));
+		hh.add(new HeaderField("Access-Control-Allow-Methods",
 				m.contains(null) ? "*" : m.stream().collect(Collectors.joining(", "))));
-		hh.add(new HttpHeader("Access-Control-Allow-Headers", h));
+		hh.add(new HeaderField("Access-Control-Allow-Headers", h));
 	}
 }
