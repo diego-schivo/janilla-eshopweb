@@ -35,7 +35,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.janilla.eshopweb.core.ApplicationUser;
-import com.janilla.eshopweb.web.AccountWeb.Account;
 import com.janilla.http.HttpExchange;
 import com.janilla.json.Jwt;
 import com.janilla.net.Net;
@@ -61,13 +60,13 @@ public class TwoFactorAuthenticationWeb {
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator")
-	public Account getAuthenticator(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getAuthenticator(HttpExchange exchange) throws IOException {
 		var u = ((CustomExchange) exchange).getUser(true);
-		return new Account(new Authenticator(u));
+		return new AccountWeb.Account(new Authenticator(u));
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/enable")
-	public Account getEnable(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getEnable(HttpExchange exchange) throws IOException {
 		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().secretKey() == null)
@@ -75,7 +74,7 @@ public class TwoFactorAuthenticationWeb {
 		var k = u.getTwoFactor().secretKey();
 		var f = formatSecretKey(k);
 		var q = getQRCode(u.getEmail(), k);
-		return new Account(new Enable(f, q));
+		return new AccountWeb.Account(new Enable(f, q));
 	}
 
 	@Handle(method = "POST", path = "/account/authenticator/enable")
@@ -101,12 +100,12 @@ public class TwoFactorAuthenticationWeb {
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/disable")
-	public Account getDisable(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getDisable(HttpExchange exchange) throws IOException {
 		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (!u.getTwoFactor().enabled())
 			throw new RuntimeException();
-		return new Account(new Disable());
+		return new AccountWeb.Account(new Disable());
 	}
 
 	@Handle(method = "POST", path = "/account/authenticator/disable")
@@ -124,22 +123,22 @@ public class TwoFactorAuthenticationWeb {
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/recovery")
-	public Account getRecovery(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getRecovery(HttpExchange exchange) throws IOException {
 		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().recoveryCodeHashes() != null)
 			throw new RuntimeException();
 		var c = setRecoveryCodes(u);
-		return new Account(new Recovery(c));
+		return new AccountWeb.Account(new Recovery(c));
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/reset")
-	public Account getReset(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getReset(HttpExchange exchange) throws IOException {
 		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().secretKey() == null)
 			throw new RuntimeException();
-		return new Account(new Reset());
+		return new AccountWeb.Account(new Reset());
 	}
 
 	@Handle(method = "POST", path = "/account/authenticator/reset")
@@ -157,12 +156,12 @@ public class TwoFactorAuthenticationWeb {
 	}
 
 	@Handle(method = "GET", path = "/account/authenticator/recovery/reset")
-	public Account getRecoveryReset(HttpExchange exchange) throws IOException {
+	public AccountWeb.Account getRecoveryReset(HttpExchange exchange) throws IOException {
 		var e = (CustomExchange) exchange;
 		var u = e.getUser(true);
 		if (u.getTwoFactor().recoveryCodeHashes() == null)
 			throw new RuntimeException();
-		return new Account(new RecoveryReset());
+		return new AccountWeb.Account(new RecoveryReset());
 	}
 
 	@Handle(method = "POST", path = "/account/authenticator/recovery/reset")

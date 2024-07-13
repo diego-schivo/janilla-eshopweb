@@ -61,8 +61,8 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 				var s = exchange.getResponse();
 //				s.setStatus(HttpResponse.Status.of(302));
 				s.setStatus(302);
-				s.getHeaders().add(new HeaderField("Cache-Control", "no-cache"));
-				s.getHeaders().add(new HeaderField("Location", u.toString()));
+				s.getHeaders().add(new HeaderField("cache-control", "no-cache"));
+				s.getHeaders().add(new HeaderField("location", u.toString()));
 				return true;
 			}
 		}

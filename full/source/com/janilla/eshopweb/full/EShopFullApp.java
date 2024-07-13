@@ -32,6 +32,7 @@ import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.eshopweb.api.EShopApiApp;
 import com.janilla.eshopweb.web.EShopWebApp;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandler;
 import com.janilla.net.Server;
 import com.janilla.util.Lazy;
 import com.janilla.web.NotFoundException;
@@ -52,7 +53,7 @@ public class EShopFullApp {
 		var s = new Server();
 		s.setAddress(
 				new InetSocketAddress(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port"))));
-		s.setHandler(a.getHandler());
+		// s.setHandler(a.getHandler());
 		s.serve();
 	}
 
@@ -76,9 +77,9 @@ public class EShopFullApp {
 		return a;
 	});
 
-	static ThreadLocal<Server.Handler> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<HttpHandler> currentHandler = new ThreadLocal<>();
 
-	Supplier<Server.Handler> handler = Lazy.of(() -> {
+	Supplier<HttpHandler> handler = Lazy.of(() -> {
 		var hh = List.of(getAdmin().getHandler(), getWeb().getHandler(), getApi().getHandler());
 		return x -> {
 			var e = (HttpExchange) x;
@@ -102,8 +103,7 @@ public class EShopFullApp {
 				if (f != e) {
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
-					// TODO
-					// f.setException(e.getException());
+					f.setException(e.getException());
 				}
 				currentHandler.set(h);
 				try {
@@ -140,7 +140,7 @@ public class EShopFullApp {
 		return web.get();
 	}
 
-	public Server.Handler getHandler() {
+	public HttpHandler getHandler() {
 		return handler.get();
 	}
 }

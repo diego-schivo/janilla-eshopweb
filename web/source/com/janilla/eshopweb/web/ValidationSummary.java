@@ -24,7 +24,7 @@
 package com.janilla.eshopweb.web;
 
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import com.janilla.web.Render;
 
@@ -40,7 +40,7 @@ public class ValidationSummary implements Iterable<@Render("<li>{}</li>\n") Stri
 	@Override
 	public Iterator<String> iterator() {
 		return validationMessages != null && !validationMessages.isEmpty()
-				? validationMessages.stream().map(Entry::getValue).iterator()
+				? validationMessages.stream().map(Map.Entry::getValue).iterator()
 				: null;
 	}
 }

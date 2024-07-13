@@ -25,14 +25,13 @@ package com.janilla.eshopweb.web;
 
 import com.janilla.eshopweb.core.BasketItem;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.RenderEngine.Entry;
 import com.janilla.http.HttpExchange;
 import com.janilla.web.TemplateHandlerFactory;
 
 public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	@Override
-	protected void render(Entry input, HttpExchange exchange) {
+	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		var o = input.getValue();
 		if (o instanceof Page p)
 			input = RenderEngine.Entry.of(null, toLayout(p, exchange), null);

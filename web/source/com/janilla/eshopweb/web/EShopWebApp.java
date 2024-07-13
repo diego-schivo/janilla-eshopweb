@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHandler;
 import com.janilla.io.IO;
 import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
@@ -57,7 +58,7 @@ public class EShopWebApp {
 
 		var s = new Server();
 		s.setAddress(new InetSocketAddress(Integer.parseInt(p.getProperty("eshopweb.web.server.port"))));
-		s.setHandler(a.getHandler());
+		// s.setHandler(a.getHandler());
 		s.serve();
 	}
 
@@ -82,9 +83,9 @@ public class EShopWebApp {
 		return a;
 	});
 
-	static ThreadLocal<Server.Handler> currentHandler = new ThreadLocal<>();
+	static ThreadLocal<HttpHandler> currentHandler = new ThreadLocal<>();
 
-	Supplier<Server.Handler> handler = Lazy.of(() -> {
+	Supplier<HttpHandler> handler = Lazy.of(() -> {
 		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		var hh = List.of(getAdmin().getHandler(), b.build());
 		return x -> {
@@ -105,8 +106,7 @@ public class EShopWebApp {
 					var f = getFactory().create(HttpExchange.class);
 					f.setRequest(e.getRequest());
 					f.setResponse(e.getResponse());
-					// TODO
-//					f.setException(e.getException());
+					f.setException(e.getException());
 					e = f;
 				}
 				currentHandler.set(h);
@@ -144,7 +144,7 @@ public class EShopWebApp {
 		return admin.get();
 	}
 
-	public Server.Handler getHandler() {
+	public HttpHandler getHandler() {
 		return handler.get();
 	}
 }

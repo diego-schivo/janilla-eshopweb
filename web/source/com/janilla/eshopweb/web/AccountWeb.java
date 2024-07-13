@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -158,7 +157,7 @@ public class AccountWeb {
 				<li>{}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()
-					? validationMessages.stream().map(Entry::getValue)
+					? validationMessages.stream().map(Map.Entry::getValue)
 					: null;
 		}
 	}
@@ -179,7 +178,7 @@ public class AccountWeb {
 				<li>{}</li>
 				""") String> validationSummary() {
 			return validationMessages != null && !validationMessages.isEmpty()
-					? validationMessages.stream().map(Entry::getValue)
+					? validationMessages.stream().map(Map.Entry::getValue)
 					: null;
 		}
 
