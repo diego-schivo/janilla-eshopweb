@@ -26,8 +26,8 @@ package com.janilla.eshopweb.web;
 import java.net.URI;
 
 import com.janilla.frontend.RenderEngine;
+import com.janilla.http.HeaderField;
 import com.janilla.http.HttpExchange;
-import com.janilla.media.HeaderField;
 import com.janilla.net.Net;
 import com.janilla.util.EntryList;
 import com.janilla.web.Error;

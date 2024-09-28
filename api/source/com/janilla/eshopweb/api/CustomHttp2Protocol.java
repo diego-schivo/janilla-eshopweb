@@ -24,11 +24,11 @@
 package com.janilla.eshopweb.api;
 
 import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpProtocol;
 import com.janilla.http.HttpExchange;
-import com.janilla.http2.Http2Protocol;
 import com.janilla.reflect.Factory;
 
-public class CustomHttp2Protocol extends Http2Protocol {
+public class CustomHttp2Protocol extends HttpProtocol {
 
 	public Factory factory;
 

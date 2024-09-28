@@ -25,8 +25,8 @@ package com.janilla.eshopweb.api;
 
 import java.util.Properties;
 
+import com.janilla.http.HeaderField;
 import com.janilla.http.HttpExchange;
-import com.janilla.media.HeaderField;
 import com.janilla.web.JsonHandlerFactory;
 
 public class CustomJsonHandlerFactory extends JsonHandlerFactory {
@@ -40,7 +40,7 @@ public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 	@Override
 	protected void render(Object object, HttpExchange exchange) {
 		var o = configuration.getProperty("eshopweb.api.cors.origin");
-		exchange.getResponse().getHeaders().add(new HeaderField("Access-Control-Allow-Origin", o));
+		exchange.getResponse().getHeaders().add(new HeaderField("access-control-allow-origin", o));
 
 		super.render(object, exchange);
 	}
