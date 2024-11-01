@@ -56,7 +56,8 @@ public class CustomExceptionHandlerFactory extends ExceptionHandlerFactory {
 			};
 			if (p != null) {
 				var q = new EntryList<String, String>();
-				q.add("returnUrl", exchange.getRequest().getUri().toString());
+//				q.add("returnUrl", exchange.getRequest().getUri().toString());
+				q.add("returnUrl", exchange.getRequest().getPath());
 				var u = URI.create("/user/login?" + Net.formatQueryString(q));
 				var s = exchange.getResponse();
 //				s.setStatus(HttpResponse.Status.of(302));

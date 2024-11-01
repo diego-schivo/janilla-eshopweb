@@ -36,6 +36,7 @@ import com.janilla.eshopweb.core.ApplicationUser;
 import com.janilla.eshopweb.core.Basket;
 import com.janilla.http.HeaderField;
 import com.janilla.http.Http;
+import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpExchange;
 import com.janilla.io.IO;
 import com.janilla.json.Jwt;
@@ -121,8 +122,10 @@ public class CustomExchange extends HttpExchange {
 	static String BASKET_COOKIE = "basket";
 
 	public void addBasketCookie(String value) {
-		getResponse().getHeaders().add(new HeaderField("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, value,
-				ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS).plusYears(10), "/", "strict")));
+		getResponse().getHeaders()
+				.add(new HeaderField("set-cookie", HttpCookie.of(BASKET_COOKIE, value)
+						.withExpires(ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS).plusYears(10))
+						.withPath("/").withSameSite("strict").format()));
 	}
 
 	public String getBasketCookie() {
@@ -132,15 +135,18 @@ public class CustomExchange extends HttpExchange {
 	}
 
 	public void removeBasketCookie() {
-		getResponse().getHeaders().add(new HeaderField("Set-Cookie", Http.formatSetCookieHeader(BASKET_COOKIE, null,
-				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict")));
+		getResponse().getHeaders()
+				.add(new HeaderField("set-cookie",
+						HttpCookie.of(BASKET_COOKIE, null)
+								.withExpires(ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)).withPath("/")
+								.withSameSite("strict").format()));
 	}
 
 	static String USER_COOKIE = "user";
 
 	public void addUserCookie(String value) {
-		getResponse().getHeaders()
-				.add(new HeaderField("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, value, null, "/", "strict")));
+		getResponse().getHeaders().add(new HeaderField("set-cookie",
+				HttpCookie.of(USER_COOKIE, value).withPath("/").withSameSite("strict").format()));
 	}
 
 	public String getUserCookie() {
@@ -150,7 +156,10 @@ public class CustomExchange extends HttpExchange {
 	}
 
 	public void removeUserCookie() {
-		getResponse().getHeaders().add(new HeaderField("Set-Cookie", Http.formatSetCookieHeader(USER_COOKIE, null,
-				ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC), "/", "strict")));
+		getResponse().getHeaders()
+				.add(new HeaderField("set-cookie",
+						HttpCookie.of(USER_COOKIE, null)
+								.withExpires(ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)).withPath("/")
+								.withSameSite("strict").format()));
 	}
 }

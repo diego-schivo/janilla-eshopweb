@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-//package com.janilla.eshopweb.api;
-//
-//import com.janilla.http.HttpExchange;
-//import com.janilla.http.HttpRequest;
-//import com.janilla.net.Server;
-//import com.janilla.reflect.Factory;
-//
-//public class CustomServer extends Server {
-//
-//	public Factory factory;
-//
-//	@Override
-//	protected HttpExchange createExchange(HttpRequest request) {
-//		return factory.create(HttpExchange.class);
-//	}
-//}
+package com.janilla.eshopweb.api;
+
+import com.janilla.http.HttpRequest;
+import com.janilla.http.HttpProtocol;
+import com.janilla.http.HttpExchange;
+import com.janilla.reflect.Factory;
+
+public class CustomHttpProtocol extends HttpProtocol {
+
+	public Factory factory;
+
+	@Override
+	protected HttpExchange createExchange(HttpRequest request) {
+		return factory.create(HttpExchange.class);
+	}
+}

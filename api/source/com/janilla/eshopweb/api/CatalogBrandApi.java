@@ -39,7 +39,7 @@ public class CatalogBrandApi {
 	}
 
 	@Handle(method = "GET", path = "/api/catalog-brands")
-	public Object list(CustomExchange exchange) throws IOException {
+	public Object list(CustomHttpExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		var c = persistence.crud(CatalogBrand.class);
 		var i = c.list();

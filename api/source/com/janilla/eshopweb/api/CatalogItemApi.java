@@ -42,7 +42,7 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "GET", path = "/api/catalog-items")
-	public Object list(CustomExchange exchange) throws IOException {
+	public Object list(CustomHttpExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		var c = persistence.crud(CatalogItem.class);
 		var i = c.list();
@@ -51,7 +51,7 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "POST", path = "/api/catalog-items")
-	public Object create(CatalogItem item, CustomExchange exchange) throws IOException {
+	public Object create(CatalogItem item, CustomHttpExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		item.setPictureUri(URI.create("/eCatalog-item-default.png"));
 		var c = persistence.crud(CatalogItem.class);
@@ -60,7 +60,7 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "PUT", path = "/api/catalog-items")
-	public Object update(CatalogItem item, CustomExchange exchange) throws IOException {
+	public Object update(CatalogItem item, CustomHttpExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		var c = persistence.crud(CatalogItem.class);
 		var i = c.update(item.getId(), x -> Reflection.copy(item, x, y -> !Set.of("id", "pictureUri").contains(y)));
@@ -68,7 +68,7 @@ public class CatalogItemApi {
 	}
 
 	@Handle(method = "DELETE", path = "/api/catalog-items/(\\d+)")
-	public Object delete(long id, CustomExchange exchange) throws IOException {
+	public Object delete(long id, CustomHttpExchange exchange) throws IOException {
 		exchange.requireAdministrator();
 		persistence.crud(CatalogItem.class).delete(id);
 		return Map.of("status", "Deleted");

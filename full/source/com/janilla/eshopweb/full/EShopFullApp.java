@@ -23,124 +23,125 @@
  */
 package com.janilla.eshopweb.full;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Supplier;
 
 import com.janilla.eshopweb.admin.EShopAdminApp;
 import com.janilla.eshopweb.api.EShopApiApp;
 import com.janilla.eshopweb.web.EShopWebApp;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpProtocol;
+import com.janilla.net.Net;
 import com.janilla.net.Server;
-import com.janilla.util.Lazy;
+import com.janilla.reflect.Factory;
+import com.janilla.util.Util;
 import com.janilla.web.NotFoundException;
 
 public class EShopFullApp {
 
 	public static void main(String[] args) throws Exception {
-		var a = new EShopFullApp();
-		{
-			var c = new Properties();
-			try (var s = EShopFullApp.class.getResourceAsStream("configuration.properties")) {
-				c.load(s);
+		var pp = new Properties();
+		try (var is = EShopFullApp.class.getResourceAsStream("configuration.properties")) {
+			pp.load(is);
+			if (args.length > 0) {
+				var p = args[0];
+				if (p.startsWith("~"))
+					p = System.getProperty("user.home") + p.substring(1);
+				pp.load(Files.newInputStream(Path.of(p)));
 			}
-			a.setConfiguration(c);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		a.getApi().getPersistence();
+		var a = new EShopFullApp(pp);
+
+		var hp = a.factory.create(HttpProtocol.class);
+		try (var is = Net.class.getResourceAsStream("testkeys")) {
+			hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		hp.setHandler(a.handler);
 
 		var s = new Server();
-		s.setAddress(
-				new InetSocketAddress(Integer.parseInt(a.getConfiguration().getProperty("eshopweb.full.server.port"))));
-		// s.setHandler(a.getHandler());
+		s.setAddress(new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("eshopweb.full.server.port"))));
+		s.setProtocol(hp);
 		s.serve();
 	}
 
 	public Properties configuration;
 
-	Supplier<EShopApiApp> api = Lazy.of(() -> {
-		var a = new EShopApiApp();
-		a.configuration = configuration;
-		return a;
-	});
+	public Factory factory;
 
-	Supplier<EShopAdminApp> admin = Lazy.of(() -> {
-		var a = new EShopAdminApp();
-		a.configuration = configuration;
-		return a;
-	});
+	public EShopApiApp api;
 
-	Supplier<EShopWebApp> web = Lazy.of(() -> {
-		var a = new EShopWebApp();
-		a.configuration = configuration;
-		return a;
-	});
+	public EShopAdminApp admin;
+
+	public EShopWebApp web;
+
+	public HttpHandler handler;
 
 	static ThreadLocal<HttpHandler> currentHandler = new ThreadLocal<>();
 
-	Supplier<HttpHandler> handler = Lazy.of(() -> {
-		var hh = List.of(getAdmin().getHandler(), getWeb().getHandler(), getApi().getHandler());
-		return x -> {
-			var e = (HttpExchange) x;
-			try {
-				e.getRequest().getUri();
-//				System.out.println("u " + u);
-			} catch (NullPointerException f) {
-				f.printStackTrace();
-				return false;
-			}
-			var h = currentHandler.get();
-			var n = h == null;
-			if (n)
-				h = hh.get(0);
-			for (;;) {
-				var f = e;
-				if (h == hh.get(1))
-					f = getWeb().getFactory().create(HttpExchange.class);
-				if (h == hh.get(2))
-					f = getApi().getFactory().create(HttpExchange.class);
-				if (f != e) {
-					f.setRequest(e.getRequest());
-					f.setResponse(e.getResponse());
-					f.setException(e.getException());
-				}
-				currentHandler.set(h);
-				try {
-					return h.handle(f);
-				} catch (NotFoundException g) {
-					var i = n ? hh.indexOf(h) + 1 : -1;
-					if (i < 0 || i >= hh.size())
-						throw new NotFoundException();
-					h = hh.get(i);
-				} finally {
-					currentHandler.remove();
-				}
-			}
-		};
-	});
-
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
+	public EShopFullApp(Properties configuration) {
 		this.configuration = configuration;
+
+		factory = new Factory();
+		factory.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
+		factory.setSource(this);
+
+		api = new EShopApiApp(configuration);
+		admin = new EShopAdminApp(configuration);
+		web = new EShopWebApp(configuration);
+
+		{
+			var hh = List.of(admin.handler, web.handler, api.handler);
+			handler = x -> {
+				var he = (HttpExchange) x;
+				try {
+					he.getRequest().getPath();
+//					System.out.println("u " + u);
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+					return false;
+				}
+				var h = currentHandler.get();
+				var n = h == null;
+				if (n)
+					h = hh.get(0);
+				for (;;) {
+					var f = he;
+					if (h == hh.get(1))
+						f = web.factory.create(HttpExchange.class);
+					if (h == hh.get(2))
+						f = api.factory.create(HttpExchange.class);
+					if (f != he) {
+						f.setRequest(he.getRequest());
+						f.setResponse(he.getResponse());
+						f.setException(he.getException());
+					}
+					currentHandler.set(h);
+					try {
+						return h.handle(f);
+					} catch (NotFoundException e) {
+						var i = n ? hh.indexOf(h) + 1 : -1;
+						if (i < 0 || i >= hh.size())
+							throw new NotFoundException();
+						h = hh.get(i);
+					} finally {
+						currentHandler.remove();
+					}
+				}
+			};
+		}
 	}
 
-	public EShopApiApp getApi() {
-		return api.get();
-	}
-
-	public EShopAdminApp getAdmin() {
-		return admin.get();
-	}
-
-	public EShopWebApp getWeb() {
-		return web.get();
-	}
-
-	public HttpHandler getHandler() {
-		return handler.get();
+	public EShopFullApp getApplication() {
+		return this;
 	}
 }

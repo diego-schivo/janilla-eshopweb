@@ -23,14 +23,19 @@
  */
 package com.janilla.eshopweb.admin;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpProtocol;
+import com.janilla.net.Net;
 import com.janilla.net.Server;
 import com.janilla.reflect.Factory;
-import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
@@ -38,45 +43,55 @@ import com.janilla.web.MethodHandlerFactory;
 public class EShopAdminApp {
 
 	public static void main(String[] args) throws Exception {
-		var p = new Properties();
-		try (var s = EShopAdminApp.class.getResourceAsStream("configuration.properties")) {
-			p.load(s);
+		var pp = new Properties();
+		try (var is = EShopAdminApp.class.getResourceAsStream("configuration.properties")) {
+			pp.load(is);
+			if (args.length > 0) {
+				var p = args[0];
+				if (p.startsWith("~"))
+					p = System.getProperty("user.home") + p.substring(1);
+				pp.load(Files.newInputStream(Path.of(p)));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
+		var a = new EShopAdminApp(pp);
 
-		var a = new EShopAdminApp();
-		a.configuration = p;
+		var hp = a.factory.create(HttpProtocol.class);
+		try (var is = Net.class.getResourceAsStream("testkeys")) {
+			hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		hp.setHandler(a.handler);
 
-		var s = a.getFactory().create(Server.class);
-		s.setAddress(new InetSocketAddress(Integer.parseInt(p.getProperty("eshopweb.admin.server.port"))));
-		// s.setHandler(a.getHandler());
+		var s = new Server();
+		s.setAddress(
+				new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("eshopweb.admin.server.port"))));
+		s.setProtocol(hp);
 		s.serve();
 	}
 
 	public Properties configuration;
 
+	public Factory factory;
+
+	public HttpHandler handler;
+
 	public MethodHandlerFactory methodHandlerFactory;
 
-	private Supplier<Factory> factory = Lazy.of(() -> {
-		var f = new Factory();
-		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
-		f.setSource(this);
-		return f;
-	});
+	public EShopAdminApp(Properties configuration) {
+		this.configuration = configuration;
 
-	Supplier<HttpHandler> handler = Lazy.of(() -> {
-		var b = getFactory().create(ApplicationHandlerBuilder.class);
-		return b.build();
-	});
+		factory = new Factory();
+		factory.setTypes(Stream.concat(Util.getPackageClasses("com.janilla.eshopweb.core"),
+				Util.getPackageClasses(getClass().getPackageName())).toList());
+		factory.setSource(this);
+
+		handler = factory.create(ApplicationHandlerBuilder.class).build();
+	}
 
 	public EShopAdminApp getApplication() {
 		return this;
-	}
-
-	public Factory getFactory() {
-		return factory.get();
-	}
-
-	public HttpHandler getHandler() {
-		return handler.get();
 	}
 }
