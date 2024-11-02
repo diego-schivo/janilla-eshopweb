@@ -25,6 +25,6 @@ module com.janilla.eshopweb.full {
 
 	exports com.janilla.eshopweb.full;
 
-	requires com.janilla.eshopweb.api;
-	requires com.janilla.eshopweb.web;
+	requires transitive com.janilla.eshopweb.api;
+	requires transitive com.janilla.eshopweb.web;
 }
